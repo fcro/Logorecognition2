@@ -1,4 +1,4 @@
-package com.telecomlille.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,6 +8,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
 public class MainActivity extends AppCompatActivity {
 
