@@ -31,7 +31,7 @@ public class ImageHttpRequest extends HttpRequest {
     }
 
     @Override
-    public void sendMessage(Object response) {
+    protected void sendMessage(Object response) {
 
         Message message = mHandler.obtainMessage();
         message.arg1 = IMAGE_REQUEST;

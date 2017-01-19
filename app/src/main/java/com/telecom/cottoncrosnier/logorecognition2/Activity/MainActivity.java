@@ -48,21 +48,24 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean handleMessage(Message msg) {
 
-            switch (msg.arg1){
-                case ImageHttpRequest.IMAGE_REQUEST:
-                    onImageRequestResult(msg.getData());
-                    break;
+            Bundle data = msg.getData();
+            if(data != null) {
+                switch (msg.arg1) {
+                    case ImageHttpRequest.IMAGE_REQUEST:
+                        onImageRequestResult(msg.getData());
+                        break;
 
-                case JsonHttpRequest.JSON_REQUEST:
-                    onJSONRequestResult(msg.getData());
-                    break;
+                    case JsonHttpRequest.JSON_REQUEST:
+                        onJSONRequestResult(msg.getData());
+                        break;
 
-                case StringHttpRequest.STRING_REQUEST:
-                    onStringRequestResult(msg.getData());
-                    break;
+                    case StringHttpRequest.STRING_REQUEST:
+                        onStringRequestResult(msg.getData());
+                        break;
+                }
             }
             return true;
-        }
+            }
     });
 
 
@@ -101,14 +104,12 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Classifier classifier = new Classifier(this);
-        StringHttpRequest httpRequest = new StringHttpRequest(this, handler, BASE_URL);
-        httpRequest.sendRequest("test_images.txt");
-        httpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
-        httpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
+
+        sendGetClassifiersRequest();
+
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
-        ImageHttpRequest imageHttpRequest = new ImageHttpRequest(this,handler,BASE_URL);
-        imageHttpRequest.sendRequest("train-images/Coca_12.jpg");
+
     }
 
     @Override
@@ -120,11 +121,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        //
-        if (id == R.id.action_settings) {
+        int id = item.getItemId();
+        Log.d(TAG, "onOptionsItemSelected: id = " + id);
+        if (id == R.id.view_website) {
+            startBrowser();
+            return true;
+        } else if (id == R.id.delete_photo) {
+            deletePhoto();
             return true;
         }
 
@@ -204,6 +208,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "handleMessage: img " + img.toString());
     }
 
+
+    private void sendGetClassifiersRequest( ){
+
+        StringHttpRequest stringHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
+        stringHttpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
+        stringHttpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
+        stringHttpRequest.sendRequest(CLASSIFIER_SPRITE_REQUEST);
+    }
+
     public void startCamera() {
         Intent startTakePhoto = new Intent(MainActivity.this, TakePhotoActivity.class);
         startActivityForResult(startTakePhoto, TAKE_PHOTO_REQUEST);
@@ -230,5 +243,15 @@ public class MainActivity extends AppCompatActivity {
 //        } else {
 //            Utils.toast(this,"please select an item");
 //        }
+    }
+
+    private void deletePhoto() {
+//        if (mId == INVALID_POSITION) {
+//            Utils.toast(this,"please select an item");
+//            return;
+//        }
+//
+//        mPhotoAdapter.remove(mArrayPhoto.get(mId));
+//        mId = INVALID_POSITION;
     }
 }

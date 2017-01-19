@@ -16,11 +16,13 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
     private static final String TAG = HttpRequest.class.getSimpleName();
 
 
+    static protected RequestQueue mQueue;
+
     public static final String KEY_REQUEST = "key_request";
 
     protected String mBaseUrl;
     protected Handler mHandler;
-    protected RequestQueue mQueue;
+
 
     protected String request;
 
@@ -33,7 +35,7 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
 
     public abstract void sendRequest(String request);
 
-    public abstract void sendMessage(Object response);
+    protected abstract void sendMessage(Object response);
 
     @Override
     public abstract void onResponse(Object response);

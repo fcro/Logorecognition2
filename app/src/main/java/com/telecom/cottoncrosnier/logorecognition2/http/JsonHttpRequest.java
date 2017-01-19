@@ -37,7 +37,7 @@ public class JsonHttpRequest extends HttpRequest {
     }
 
     @Override
-    public void sendMessage(Object response) {
+    protected void sendMessage(Object response) {
 
         Message message = mHandler.obtainMessage();
         message.arg1 = JSON_REQUEST;

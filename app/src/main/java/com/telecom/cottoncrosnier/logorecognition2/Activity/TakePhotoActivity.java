@@ -13,7 +13,7 @@ import com.telecom.cottoncrosnier.logorecognition2.Utils;
 
 import java.io.File;
 
-/*
+/**
  * Activité permettant le démarrage de l'appareil photo.
  */
 public class TakePhotoActivity extends Activity {

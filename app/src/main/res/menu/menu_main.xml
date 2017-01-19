@@ -2,9 +2,16 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.telecomlille.cottoncrosnier.logorecognition2.MainActivity">
+
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/view_website"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="@string/menu_view_web_site"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/delete_photo"
+        android:orderInCategory="100"
+        android:title="@string/menu_delete_photo"
         app:showAsAction="never" />
 </menu>

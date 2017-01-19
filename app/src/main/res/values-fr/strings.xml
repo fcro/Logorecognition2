@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Logorecognition2</string>
+    <string name="action_settings">Options</string>
+    <string name="dialog_select_camera">Appareil photo</string>
+    <string name="dialog_select_gallery">Galerie</string>
+    <string name="dialog_select_prompt">Choisir une photo</string>
+    <string name="menu_delete_photo">Supprimer la photo</string>
+    <string name="menu_view_web_site">Visiter le site web</string>
+</resources>
