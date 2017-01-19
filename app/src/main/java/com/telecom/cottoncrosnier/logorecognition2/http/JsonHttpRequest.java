@@ -22,6 +22,7 @@ public class JsonHttpRequest extends HttpRequest {
     public static final String KEY_JSON = "key_json";
 
     private static final String TAG = JsonHttpRequest.class.getSimpleName();
+
     public JsonHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
         Log.d(TAG, "JsonHttpRequest() called with: context = [" + context + "], handler = [" + handler + "], baseUrl = [" + baseUrl + "]");
@@ -32,6 +33,7 @@ public class JsonHttpRequest extends HttpRequest {
         Log.d(TAG, "sendRequest() called with: request = [" + request + "]");
         mQueue.add(new JsonObjectRequest(Request.Method.GET, mBaseUrl + request,null,this,this) {
         });
+        this.request = request;
     }
 
     @Override
@@ -42,6 +44,8 @@ public class JsonHttpRequest extends HttpRequest {
 
         Bundle bundle = new Bundle();
         bundle.putString(KEY_JSON, response.toString());
+        bundle.putString(KEY_REQUEST, request);
+
         message.setData(bundle);
 
         mHandler.sendMessage(message);

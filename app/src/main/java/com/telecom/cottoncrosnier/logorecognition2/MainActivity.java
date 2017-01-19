@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.ImageHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.StringHttpRequest;
@@ -77,11 +78,13 @@ public class MainActivity extends AppCompatActivity {
 
             switch (msg.arg1){
                 case ImageHttpRequest.IMAGE_REQUEST:
+                    Log.d(TAG, "handleMessage: request = " + msg.getData().getString(HttpRequest.KEY_REQUEST));
                     Bitmap img = msg.getData().getParcelable(ImageHttpRequest.KEY_IMAGE);
                     Log.d(TAG, "handleMessage: img "+img.toString());
                     break;
 
                 case JsonHttpRequest.JSON_REQUEST:
+                    Log.d(TAG, "handleMessage: request = " + msg.getData().getString(HttpRequest.KEY_REQUEST));
                     try {
                         JSONObject data = new JSONObject(msg.getData().getString(JsonHttpRequest.KEY_JSON));
                         Log.d(TAG, "handleMessage: data "+data.toString());
@@ -91,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
 
                 case StringHttpRequest.STRING_REQUEST:
+                    Log.d(TAG, "handleMessage: request = " + msg.getData().getString(HttpRequest.KEY_REQUEST));
                     Log.d(TAG, "handleMessage: msg = " + msg.getData().getString(StringHttpRequest.KEY_STRING));
                     break;
             }

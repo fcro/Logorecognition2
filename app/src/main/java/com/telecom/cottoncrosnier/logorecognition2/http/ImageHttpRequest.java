@@ -26,9 +26,8 @@ public class ImageHttpRequest extends HttpRequest {
 
     @Override
     public void sendRequest(String request) {
-
         mQueue.add(new ImageRequest(mBaseUrl + request, this, 0, 0, null, null, this));
-
+        this.request = request;
     }
 
     @Override
@@ -39,6 +38,7 @@ public class ImageHttpRequest extends HttpRequest {
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(KEY_IMAGE, (Bitmap) response);
+        bundle.putString(KEY_REQUEST, request);
         message.setData(bundle);
 
         mHandler.sendMessage(message);

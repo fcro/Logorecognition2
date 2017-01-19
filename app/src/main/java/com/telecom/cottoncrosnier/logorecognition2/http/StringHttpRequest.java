@@ -18,6 +18,8 @@ public class StringHttpRequest extends HttpRequest {
     public static final int STRING_REQUEST = 3333;
     public static final String KEY_STRING = "key_string";
 
+
+
     public StringHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
     }
@@ -25,6 +27,7 @@ public class StringHttpRequest extends HttpRequest {
     @Override
     public void sendRequest(String request) {
         mQueue.add(new StringRequest(Request.Method.GET, mBaseUrl + request, this, this));
+        this.request = request;
     }
 
     @Override
@@ -34,6 +37,7 @@ public class StringHttpRequest extends HttpRequest {
 
         Bundle bundle = new Bundle();
         bundle.putString(KEY_STRING, response.toString());
+        bundle.putString(KEY_REQUEST,request);
         message.setData(bundle);
 
         mHandler.sendMessage(message);
