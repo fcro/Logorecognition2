@@ -8,6 +8,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
 
+import com.telecom.cottoncrosnier.logorecognition2.Activity.MainActivity;
+
 import static org.bytedeco.javacpp.opencv_highgui.imread;
 
 import org.bytedeco.javacpp.Loader;
@@ -39,6 +41,8 @@ public class Classifier {
     private BOWImgDescriptorExtractor mBowide;
     private SIFT detector;
 
+    private  CvSVM[] classifiers;
+
     public Classifier(Context contextMain) { // TODO rajouter throw filenullexeption
 
         detector = new SIFT(0, 3, 0.04, 10, 1.6);
@@ -54,18 +58,18 @@ public class Classifier {
         final FlannBasedMatcher matcher = new FlannBasedMatcher();
 
         mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
-//        createVocabulary();
+        createVocabulary();
 
-//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-//        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
-//
-//        final CvSVM[] classifiers = loadClassifier();
-//
-//        long timePrediction = System.currentTimeMillis();
-//        String bestMatch = bestMatch(response_hist, classifiers);
-//        timePrediction = System.currentTimeMillis() - timePrediction;
+        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
+        Mat response_hist = computeHist(image.getPath(), detector);
 
-//        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
+        classifiers = loadClassifier();
+
+        long timePrediction = System.currentTimeMillis();
+        String bestMatch = bestMatch(response_hist, classifiers);
+        timePrediction = System.currentTimeMillis() - timePrediction;
+
+        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
 
     }
 
@@ -85,16 +89,20 @@ public class Classifier {
         mBowide.setVocabulary(vocabulary);
     }
 
-    private Mat computeHist(String imgPath, SIFT detector, BOWImgDescriptorExtractor bowide) {
+    private Mat computeHist(String imgPath, SIFT detector) {
 
-        Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], detector = [" + detector + "], bowide = [" + bowide + "]");
+        Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], detector = [" + detector + "]");
         Mat response_hist = new Mat();
         KeyPoint keypoints = new KeyPoint();
         Mat inputDescriptors = new Mat();
 
         Mat matImage = imread(imgPath, 1);
+        Log.d(TAG, "computeHist:: imread");
         detector.detectAndCompute(matImage, Mat.EMPTY, keypoints, inputDescriptors);
-        bowide.compute(matImage, keypoints, response_hist);
+        Log.d(TAG, "computeHist:: keypoint = "+keypoints.toString());
+        Log.d(TAG, "computeHist:: detector");
+        mBowide.compute(matImage, keypoints, response_hist);
+        Log.d(TAG, "computeHist:: bowide");
 
         return response_hist;
     }
@@ -131,11 +139,17 @@ public class Classifier {
     public void computeImageHist(Uri path){
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options),500);
+        Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options),25);
 
         File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
 
-        Mat response_hist = computeHist(bitmapFile.getPath(), detector, mBowide);
+//        Mat response_hist = computeHist(bitmapFile.getPath(), detector);
+
+        String bestmatch = bestMatch(computeHist(bitmapFile.getPath(), detector),classifiers);
+        Log.d(TAG, "computeImageHist: bestmatch = "+bestmatch);
+
+//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
+//        Mat response_hist = computeHist(image.getPath(), detector);
     }
 
 }
