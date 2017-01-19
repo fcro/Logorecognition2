@@ -16,7 +16,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.telecom.cottoncrosnier.logorecognition2.Classifier;
 import com.telecom.cottoncrosnier.logorecognition2.JsonParser;
+import com.telecom.cottoncrosnier.logorecognition2.Utils;
 import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.ImageHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
@@ -43,6 +45,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLASSIFIER_COCA_REQUEST = "classifiers/Coca.xml";
     private static final String CLASSIFIER_SPRITE_REQUEST = "classifiers/Sprite.xml";
     private static final String CLASSIFIER_PESPSI_REQUEST = "classifiers/Pepsi.xml";
+
+    private Classifier classifier;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setVisibility(View.VISIBLE);
 
 
-        //Classifier classifier = new Classifier(this);
+        classifier = new Classifier(this);
 
         sendGetClassifiersRequest();
 
@@ -144,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = data.getData();
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
-//            startAnalyze(Uri.fromFile(Utils.galleryToCache(context, imgPath, imgPath.getFragment())));
+            startAnalyze(Uri.fromFile(Utils.galleryToCache(this, imgPath, imgPath.getFragment())));
 
         } else if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult:: gallery & canceled");
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 
             if(imgPath != null){
                 Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
-//                startAnalyze(imgPath);
+                startAnalyze(imgPath);
             }
 
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == RESULT_CANCELED) {
@@ -253,5 +257,13 @@ public class MainActivity extends AppCompatActivity {
 //
 //        mPhotoAdapter.remove(mArrayPhoto.get(mId));
 //        mId = INVALID_POSITION;
+    }
+
+    private void startAnalyze(Uri uri) {
+//        Intent startAnalyze = new Intent(MainActivity.this, AnalizePhotoActivity.class);
+//        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
+//        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
+        classifier.computeImageHist(uri);
+
     }
 }

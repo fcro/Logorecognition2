@@ -3,6 +3,9 @@ package com.telecom.cottoncrosnier.logorecognition2;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.Log;
 
 import static org.bytedeco.javacpp.opencv_highgui.imread;
@@ -34,33 +37,35 @@ public class Classifier {
     private final int mClassNomber = 3;
     private String[] mClassName = new String[mClassNomber];
     private BOWImgDescriptorExtractor mBowide;
+    private SIFT detector;
 
     public Classifier(Context contextMain) { // TODO rajouter throw filenullexeption
 
+        detector = new SIFT(0, 3, 0.04, 10, 1.6);
         mMainContext = contextMain;
         mClassName[0] = "Coca";
         mClassName[1] = "Pepsi";
         mClassName[2] = "Sprite";
 
         String ref = "images/";
-        String imageName = "Coca_15";
+        String imageName = "Coca_12";
 
-        final SIFT detector = new SIFT(0, 3, 0.04, 10, 1.6);
+
         final FlannBasedMatcher matcher = new FlannBasedMatcher();
 
         mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
-        createVocabulary();
+//        createVocabulary();
 
-        File image = assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
+//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
+//        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
+//
+//        final CvSVM[] classifiers = loadClassifier();
+//
+//        long timePrediction = System.currentTimeMillis();
+//        String bestMatch = bestMatch(response_hist, classifiers);
+//        timePrediction = System.currentTimeMillis() - timePrediction;
 
-        final CvSVM[] classifiers = loadClassifier();
-
-        long timePrediction = System.currentTimeMillis();
-        String bestMatch = bestMatch(response_hist, classifiers);
-        timePrediction = System.currentTimeMillis() - timePrediction;
-
-        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
+//        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
 
     }
 
@@ -69,7 +74,7 @@ public class Classifier {
         final Mat vocabulary;
         Loader.load(opencv_core.class);
 
-        File fileVoca = assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml");
+        File fileVoca = Utils.assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml");
 
         opencv_core.CvFileStorage storage = opencv_core.cvOpenFileStorage(fileVoca.getAbsolutePath(), null, opencv_core.CV_STORAGE_READ);
         Pointer p = opencv_core.cvReadByName(storage, null, "vocabulary", opencv_core.cvAttrList());
@@ -114,7 +119,7 @@ public class Classifier {
         final CvSVM[] classifiers;
         classifiers = new CvSVM[mClassNomber];
         for (int i = 0; i < mClassNomber; i++) {
-            File classifierFile = assetToCache(mMainContext, "classifier/" + mClassName[i] + ".xml", mClassName[i] + ".xml");
+            File classifierFile = Utils.assetToCache(mMainContext, "classifier/" + mClassName[i] + ".xml", mClassName[i] + ".xml");
             classifiers[i] = new CvSVM();
 
             classifiers[i].load(classifierFile.getAbsolutePath());
@@ -122,44 +127,15 @@ public class Classifier {
         return classifiers;
     }
 
-    /**
-     * Copie un fichier des assets vers le cache de l'application.
-     *
-     * @param context   contexte de l'application pour récupérer le dossier de cache.
-     * @param assetPath chemin vers le fichier dans les assets à copier.
-     * @param fileName  nom du fichier de destination.
-     * @return fichier copié dans le cache de l'application.
-     */
-    public static File assetToCache(Context context, String assetPath, String fileName) {
-        InputStream is;
-        FileOutputStream fos;
-        int size;
-        byte[] buffer;
-        String filePath = context.getCacheDir() + "/" + fileName;
-        File file = new File(filePath);
-        AssetManager assetManager = context.getAssets();
 
-        try {
-            is = assetManager.open(assetPath);
-            size = is.available();
-            buffer = new byte[size];
+    public void computeImageHist(Uri path){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options),500);
 
-            if (is.read(buffer) <= 0) {
-                return null;
-            }
+        File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
 
-            is.close();
-
-            fos = new FileOutputStream(filePath);
-            fos.write(buffer);
-            fos.close();
-
-            return file;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
+        Mat response_hist = computeHist(bitmapFile.getPath(), detector, mBowide);
     }
-
 
 }
