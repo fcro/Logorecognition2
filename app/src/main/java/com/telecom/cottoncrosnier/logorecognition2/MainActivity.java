@@ -12,7 +12,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
+import com.telecom.cottoncrosnier.logorecognition2.http.ImageHttpRequest;
+import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
+import com.telecom.cottoncrosnier.logorecognition2.http.StringHttpRequest;
 import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
 public class MainActivity extends AppCompatActivity {
@@ -37,8 +39,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         //Classifier classifier = new Classifier(this);
-        HttpRequest httpRequest = new HttpRequest(this, handler, BASE_URL);
+        StringHttpRequest httpRequest = new StringHttpRequest(this, handler, BASE_URL);
         httpRequest.sendRequest("test_images.txt");
+        JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
+        jsonHttpRequest.sendRequest("index.json");
+        ImageHttpRequest imageHttpRequest = new ImageHttpRequest(this,handler,BASE_URL);
+        imageHttpRequest.sendRequest("train-images/Coca_12.jpg");
     }
 
     @Override
