@@ -32,7 +32,7 @@ public class Classifier {
     private final static String TAG = Classifier.class.getSimpleName();
     private Context mMainContext;
     private final int mClassNomber = 3;
-    String[] mClassName = new String[mClassNomber];
+    private String[] mClassName = new String[mClassNomber];
     private BOWImgDescriptorExtractor mBowide;
 
     public Classifier(Context contextMain) { // TODO rajouter throw filenullexeption
@@ -43,7 +43,7 @@ public class Classifier {
         mClassName[2] = "Sprite";
 
         String ref = "images/";
-        String imageName = "Pepsi_16";
+        String imageName = "Coca_15";
 
         final SIFT detector = new SIFT(0, 3, 0.04, 10, 1.6);
         final FlannBasedMatcher matcher = new FlannBasedMatcher();

@@ -1,17 +1,25 @@
 package com.telecom.cottoncrosnier.logorecognition2;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
 import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
+
+    private static final String BASE_URL = "http://www-rech.telecom-lille.fr/nonfreesift/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,8 +36,9 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-        Classifier classifier = new Classifier(this);
-
+        //Classifier classifier = new Classifier(this);
+        HttpRequest httpRequest = new HttpRequest(this, handler, BASE_URL);
+        httpRequest.sendRequest("test_images.txt");
     }
 
     @Override
@@ -53,4 +62,14 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+
+    private Handler handler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            Log.d(TAG, "handleMessage: msg.arg1 = " + msg.arg1);
+            Log.d(TAG, "handleMessage: msg = " + msg.getData().getString("test"));
+            return true;
+        }
+    });
 }
