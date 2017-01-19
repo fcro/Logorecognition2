@@ -42,13 +42,16 @@ public class Classifier {
         mClassName[1] = "Pepsi";
         mClassName[2] = "Sprite";
 
+        String ref = "images/";
+        String imageName = "Pepsi_16";
+
         final SIFT detector = new SIFT(0, 3, 0.04, 10, 1.6);
         final FlannBasedMatcher matcher = new FlannBasedMatcher();
 
         mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
         createVocabulary();
 
-        File image = assetToCache(mMainContext, "images/Coca_12.jpg", "Coca_12.jpg");
+        File image = assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
         Mat response_hist = computeHist(image.getPath(), detector, mBowide);
 
         final CvSVM[] classifiers = loadClassifier();
@@ -62,6 +65,7 @@ public class Classifier {
     }
 
     private void createVocabulary() {
+        Log.d(TAG, "createVocabulary() called");
         final Mat vocabulary;
         Loader.load(opencv_core.class);
 
@@ -78,6 +82,7 @@ public class Classifier {
 
     private Mat computeHist(String imgPath, SIFT detector, BOWImgDescriptorExtractor bowide) {
 
+        Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], detector = [" + detector + "], bowide = [" + bowide + "]");
         Mat response_hist = new Mat();
         KeyPoint keypoints = new KeyPoint();
         Mat inputDescriptors = new Mat();
@@ -90,6 +95,7 @@ public class Classifier {
     }
 
     private String bestMatch(Mat response_hist, CvSVM[] classifiers) {
+        Log.d(TAG, "bestMatch() called with: response_hist = [" + response_hist + "], classifiers = [" + classifiers + "]");
         float minf = Float.MAX_VALUE;
         String bestMatch = null;
         for (int i = 0; i < mClassNomber; i++) {
@@ -104,6 +110,7 @@ public class Classifier {
 
     private CvSVM[] loadClassifier() {
 
+        Log.d(TAG, "loadClassifier() called");
         final CvSVM[] classifiers;
         classifiers = new CvSVM[mClassNomber];
         for (int i = 0; i < mClassNomber; i++) {
