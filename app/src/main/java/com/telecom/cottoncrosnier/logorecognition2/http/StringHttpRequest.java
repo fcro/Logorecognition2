@@ -15,6 +15,11 @@ import com.android.volley.toolbox.StringRequest;
 
 public class StringHttpRequest extends HttpRequest {
 
+    public static final int STRING_REQUEST = 3333;
+    public static final String KEY_STRING = "key_string";
+
+
+
     public StringHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
     }
@@ -22,18 +27,25 @@ public class StringHttpRequest extends HttpRequest {
     @Override
     public void sendRequest(String request) {
         mQueue.add(new StringRequest(Request.Method.GET, mBaseUrl + request, this, this));
+        this.request = request;
+    }
+
+    @Override
+    public void sendMessage(Object response) {
+        Message message = mHandler.obtainMessage();
+        message.arg1 = STRING_REQUEST;
+
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_STRING, response.toString());
+        bundle.putString(KEY_REQUEST,request);
+        message.setData(bundle);
+
+        mHandler.sendMessage(message);
     }
 
     @Override
     public void onResponse(Object response) {
-        Message message = mHandler.obtainMessage();
-        message.arg1 = 1;
-
-        Bundle bundle = new Bundle();
-        bundle.putString("test", (String) response);
-        message.setData(bundle);
-
-        mHandler.sendMessage(message);
+        sendMessage(response);
     }
 
     @Override
