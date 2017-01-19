@@ -1,35 +1,31 @@
 package com.telecom.cottoncrosnier.logorecognition2;
 
-import android.util.JsonReader;
-import android.util.Log;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
- * <p>Cette classe permet de parcourir le fichier json d'index des marques. Elle crée une List
- * d'objets {@link Brand} initialisés selon le contenu du fichier json.
+ * <p>Cette classe permet de parcourir le contenu du fichier json d'index des marques. Elle crée
+ * une List d'objets {@link Brand} initialisés comme décrits dans le fichier.
  */
 public class JsonParser {
 
     private static final String TAG = JsonParser.class.getSimpleName();
 
-    private JsonReader mReader;
+    private JSONObject mJsonData;
 
 
     /**
-     * Instancie un JsonParser pour lire le fichier {@code jsonFile}.
+     * Instancie un JsonParser pour lire le contenu de {@link #mJsonData}.
      *
-     * @param jsonFile fichier d'index des marques au format json.
-     * @throws IOException si {@code jsonFile} est introuvable ou si t pas supporté.
+     * @param jsonData contenu du fichier d'index des marques au format json.
      */
-    public JsonParser(File jsonFile) throws IOException {
-        mReader = new JsonReader(new InputStreamReader(new FileInputStream(jsonFile), "UTF-8"));
+    public JsonParser(JSONObject jsonData) {
+        this.mJsonData = jsonData;
     }
 
 
@@ -37,71 +33,63 @@ public class JsonParser {
      * Récupère le nom du fichier de vocabulaire.
      *
      * @return nom du fichier de vocabulaire.
-     * @throws IOException si une erreur se produit pendant la lecture du fichier.
+     * @throws JSONException si aucun objet nommé {@code vocabulary} n'est trouvé dans {@link #mJsonData}.
      */
-    public String readVocabulary() throws IOException {
-        String vocabulary;
-        mReader.beginObject();
-        while (!mReader.nextName().equals("vocabulary")) ;
-
-        vocabulary = mReader.nextString();
-
-        mReader.endObject();
-        mReader.close();
-        return vocabulary;
+    public String readVocabulary() throws JSONException {
+        return mJsonData.getString("vocabulary");
     }
 
     /**
-     * Parcourt les marques du fichier et les ajoute à une List sous forme d'objets {@link Brand}.
+     * Parcourt les marques de {@link #mJsonData} et les ajoute à une List sous forme d'objets {@link Brand}.
      *
      * @return List des objets {@link Brand} instanciés.
+     * @throws JSONException si aucun tableau nommé {@code brands} n'est trouvé dans
+     *                       {@link #mJsonData} ou si {@link #readBrand(JSONObject)} a levé une exception.
      */
-    public List<Brand> readBrandArray() throws IOException {
+    public List<Brand> readBrandArray() throws JSONException {
         List<Brand> brands = new ArrayList<Brand>();
+        JSONArray jsonBrands = mJsonData.getJSONArray("brands");
 
-        mReader.beginObject();
-        while (!mReader.nextName().equals("brands")) ;
-
-        mReader.beginArray();
-        while (mReader.hasNext()) {
-            brands.add(readBrand());
+        for (int i = 0; i < jsonBrands.length(); ++i) {
+            brands.add(readBrand(jsonBrands.getJSONObject(i)));
         }
-        mReader.endArray();
 
-        mReader.endObject();
-        mReader.close();
         return brands;
     }
 
     /**
      * Parcourt les attributs d'une marque pour instancier un objet {@link Brand}.
      *
-     * @return objet {@link Brand} défini selon le fichier json.
-     * @throws IOException si une erreur se produit pendant la lecture du fichier.
+     * @return objet {@link Brand} décrit dans {@link #mJsonData}.
+     * @throws JSONException si un attribut de {@link Brand} est manquant ou si un attribut non
+     *                       supporté est trouvé ou si {@link #readImageArray(JSONArray)} a levé une exception.
      */
-    private Brand readBrand() throws IOException {
+    private Brand readBrand(JSONObject jsonBrand) throws JSONException {
         String brandName = null;
-        URL url = null;
+        String url = null;
         String classifier = null;
         String[] images = null;
-        ArrayList<String> imagesArrayList = new ArrayList<String>();
 
-        mReader.beginObject();
-        while (mReader.hasNext()) {
-            String name = mReader.nextName();
-            if (name.equals("brandname")) {
-                brandName = mReader.nextString();
-            } else if (name.equals("url")) {
-                url = new URL("http://" + mReader.nextString());
-            } else if (name.equals("classifier")) {
-                classifier = mReader.nextString();
-            } else if (name.equals("images")) {
-                images = readImages();
-            } else {
-                throw new IOException("Malformatted metadata file");
+        Iterator<String> keyIterator = jsonBrand.keys();
+        while (keyIterator.hasNext()) {
+            String key = keyIterator.next();
+            switch (key) {
+                case "brandname":
+                    brandName = jsonBrand.getString(key);
+                    break;
+                case "url":
+                    url = jsonBrand.getString(key);
+                    break;
+                case "classifier":
+                    classifier = jsonBrand.getString(key);
+                    break;
+                case "images":
+                    images = readImageArray(jsonBrand.getJSONArray(key));
+                    break;
+                default:
+                    throw new JSONException("Unsupported Brand attribute: " + key);
             }
         }
-        mReader.endObject();
 
         return new Brand(brandName, url, classifier, images);
     }
@@ -110,16 +98,14 @@ public class JsonParser {
      * Parcourt la liste des fichiers d'image d'une marque.
      *
      * @return liste des fichiers d'image.
-     * @throws IOException si une erreur se produit pendant la lecture du fichier.
+     * @throws JSONException si une erreur se produit pendant la lecture de {@code jsonImages}.
      */
-    private String[] readImages() throws IOException {
+    private String[] readImageArray(JSONArray jsonImages) throws JSONException {
         ArrayList<String> imagesArrayList = new ArrayList<String>();
 
-        mReader.beginArray();
-        while (mReader.hasNext()) {
-            imagesArrayList.add(mReader.nextString());
+        for (int i = 0; i < jsonImages.length(); ++i) {
+            imagesArrayList.add(jsonImages.getString(i));
         }
-        mReader.endArray();
 
         return imagesArrayList.toArray(new String[0]);
     }

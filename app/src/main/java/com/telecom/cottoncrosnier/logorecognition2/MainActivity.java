@@ -111,16 +111,16 @@ public class MainActivity extends AppCompatActivity {
 
             case CLASSIFIER_COCA_REQUEST:
                 //XML coca
-                Log.d(TAG, "onStringRequestResult: result = "+data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
                 break;
             case CLASSIFIER_PESPSI_REQUEST:
                 //XML pepsi
-                Log.d(TAG, "onStringRequestResult: result = "+data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
                 break;
 
             case CLASSIFIER_SPRITE_REQUEST:
                 //XML sprite
-                Log.d(TAG, "onStringRequestResult: result = "+data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
                 break;
             
         }
@@ -128,9 +128,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void onJSONRequestResult(Bundle data){
         try {
-            JSONObject JSONData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
-            Log.d(TAG, "handleMessage: data "+JSONData.toString());
-        }catch (JSONException e){
+            JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
+            JsonParser jsonParser = new JsonParser(jsonData);
+            Log.d(TAG, "handleMessage: brands = " + jsonParser.readBrandArray());
+            Log.d(TAG, "onJSONRequestResult: vocabulary = " + jsonParser.readVocabulary());
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
@@ -138,6 +140,6 @@ public class MainActivity extends AppCompatActivity {
     private void onImageRequestResult(Bundle data){
         Log.d(TAG, "handleMessage: request = " + data.getString(HttpRequest.KEY_REQUEST));
         Bitmap img = data.getParcelable(ImageHttpRequest.KEY_IMAGE);
-        Log.d(TAG, "handleMessage: img "+img.toString());
+        Log.d(TAG, "handleMessage: img " + img.toString());
     }
 }
