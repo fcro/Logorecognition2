@@ -1,21 +1,23 @@
 package com.telecom.cottoncrosnier.logorecognition2.http;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.Bundle;
 import android.os.Handler;
-import android.provider.ContactsContract;
+import android.os.Message;
 import android.util.Log;
-import android.widget.ImageView;
 
-import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 
 /**
  * Created by matthieu on 19/01/17.
  */
 
 public class ImageHttpRequest extends HttpRequest {
+
+    public static final int IMAGE_REQUEST = 1111;
+    public static final String KEY_IMAGE = "key_image";
 
     private static final String TAG = ImageHttpRequest.class.getSimpleName();
     public ImageHttpRequest(Context context, Handler handler, String baseUrl) {
@@ -25,15 +27,27 @@ public class ImageHttpRequest extends HttpRequest {
     @Override
     public void sendRequest(String request) {
 
-        int maxWidth = 10;
-        int maxHeight = 10;
-        mQueue.add(new ImageRequest(mBaseUrl + request,this,0,0,null,null,this));
+        mQueue.add(new ImageRequest(mBaseUrl + request, this, 0, 0, null, null, this));
 
+    }
+
+    @Override
+    public void sendMessage(Object response) {
+
+        Message message = mHandler.obtainMessage();
+        message.arg1 = IMAGE_REQUEST;
+
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(KEY_IMAGE, (Bitmap) response);
+        message.setData(bundle);
+
+        mHandler.sendMessage(message);
     }
 
     @Override
     public void onResponse(Object response) {
         Log.d(TAG, "onResponse() called with: response = [" + response + "]");
+        sendMessage(response);
     }
 
     @Override

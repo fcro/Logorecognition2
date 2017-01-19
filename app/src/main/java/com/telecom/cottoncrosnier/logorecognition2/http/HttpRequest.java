@@ -28,6 +28,7 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
 
     public abstract void sendRequest(String request);
 
+    public abstract void sendMessage(Object response);
 
     @Override
     public abstract void onResponse(Object response);

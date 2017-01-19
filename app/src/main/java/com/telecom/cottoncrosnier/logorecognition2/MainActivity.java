@@ -1,5 +1,6 @@
 package com.telecom.cottoncrosnier.logorecognition2;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -16,6 +17,9 @@ import com.telecom.cottoncrosnier.logorecognition2.http.ImageHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.StringHttpRequest;
 import com.telecomlille.cottoncrosnier.logorecognition2.R;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,9 +60,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -73,8 +74,26 @@ public class MainActivity extends AppCompatActivity {
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            Log.d(TAG, "handleMessage: msg.arg1 = " + msg.arg1);
-            Log.d(TAG, "handleMessage: msg = " + msg.getData().getString("test"));
+
+            switch (msg.arg1){
+                case ImageHttpRequest.IMAGE_REQUEST:
+                    Bitmap img = msg.getData().getParcelable(ImageHttpRequest.KEY_IMAGE);
+                    Log.d(TAG, "handleMessage: img "+img.toString());
+                    break;
+
+                case JsonHttpRequest.JSON_REQUEST:
+                    try {
+                        JSONObject data = new JSONObject(msg.getData().getString(JsonHttpRequest.KEY_JSON));
+                        Log.d(TAG, "handleMessage: data "+data.toString());
+                    }catch (JSONException e){
+                        e.printStackTrace();
+                    }
+                    break;
+
+                case StringHttpRequest.STRING_REQUEST:
+                    Log.d(TAG, "handleMessage: msg = " + msg.getData().getString(StringHttpRequest.KEY_STRING));
+                    break;
+            }
             return true;
         }
     });
