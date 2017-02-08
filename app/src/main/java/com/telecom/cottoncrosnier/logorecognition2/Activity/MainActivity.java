@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.telecom.cottoncrosnier.logorecognition2.Classifier;
+import com.telecom.cottoncrosnier.logorecognition2.FileManager;
 import com.telecom.cottoncrosnier.logorecognition2.JsonParser;
 import com.telecom.cottoncrosnier.logorecognition2.Utils;
 import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
@@ -27,6 +28,8 @@ import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -107,13 +110,15 @@ public class MainActivity extends AppCompatActivity {
         fab.setVisibility(View.VISIBLE);
 
 
-        classifier = new Classifier(this);
+        classifier = new Classifier(this.getApplicationContext());
 
         sendGetClassifiersRequest();
 
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
 
+        StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
+        ymlRequest.sendRequest(YML_REQUEST);
     }
 
     @Override
@@ -148,7 +153,9 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = data.getData();
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
-            startAnalyze(Uri.fromFile(Utils.galleryToCache(this, imgPath, imgPath.getFragment())));
+            File imgFile = Utils.galleryToCache(this, imgPath, imgPath.getFragment());
+            Uri imgUri = Uri.fromFile(imgFile);
+            startAnalyze(imgUri);
 
         } else if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult:: gallery & canceled");
@@ -173,23 +180,32 @@ public class MainActivity extends AppCompatActivity {
     }
     private void onStringRequestResult(Bundle data){
 
-        switch (data.getString(HttpRequest.KEY_REQUEST)){
+        switch (data.getString(HttpRequest.KEY_REQUEST)) {
             case YML_REQUEST:
-                //requete YML
+                Log.d(TAG, "onStringRequestResult: received vocabulary");
+                try {
+                    File vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
+                            (String) data.get(StringHttpRequest.KEY_STRING));
+
+                        classifier.setVocabulary(vocabularyFile);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Utils.toast(this, getString(R.string.error_vocabulary));
+                }
                 break;
 
             case CLASSIFIER_COCA_REQUEST:
                 //XML coca
-                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: received coca");
                 break;
             case CLASSIFIER_PESPSI_REQUEST:
                 //XML pepsi
-                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: received pepsi");
                 break;
 
             case CLASSIFIER_SPRITE_REQUEST:
                 //XML sprite
-                Log.d(TAG, "onStringRequestResult: result = " + data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: received sprite");
                 break;
             
         }
@@ -213,8 +229,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void sendGetClassifiersRequest( ){
-
+    private void sendGetClassifiersRequest( ) {
         StringHttpRequest stringHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
         stringHttpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
         stringHttpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
@@ -264,6 +279,5 @@ public class MainActivity extends AppCompatActivity {
 //        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
 //        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
         classifier.computeImageHist(uri);
-
     }
 }

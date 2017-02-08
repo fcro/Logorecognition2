@@ -2,13 +2,10 @@ package com.telecom.cottoncrosnier.logorecognition2;
 
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.util.Log;
-
-import com.telecom.cottoncrosnier.logorecognition2.Activity.MainActivity;
 
 import static org.bytedeco.javacpp.opencv_highgui.imread;
 
@@ -23,9 +20,6 @@ import org.bytedeco.javacpp.opencv_ml.CvSVM;
 import org.bytedeco.javacpp.opencv_nonfree.SIFT;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Created by matthieu on 19/01/17.
@@ -41,12 +35,10 @@ public class Classifier {
     private BOWImgDescriptorExtractor mBowide;
     private SIFT detector;
 
-    private  CvSVM[] classifiers;
-
-    public Classifier(Context contextMain) { // TODO rajouter throw filenullexeption
+    public Classifier(Context mainContext) { // TODO rajouter throw filenullexeption
 
         detector = new SIFT(0, 3, 0.04, 10, 1.6);
-        mMainContext = contextMain;
+        mMainContext = mainContext;
         mClassName[0] = "Coca";
         mClassName[1] = "Pepsi";
         mClassName[2] = "Sprite";
@@ -58,29 +50,31 @@ public class Classifier {
         final FlannBasedMatcher matcher = new FlannBasedMatcher();
 
         mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
-        createVocabulary();
 
-        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-        Mat response_hist = computeHist(image.getPath(), detector);
+//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
+//        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
+//
+//        final CvSVM[] classifiers = loadClassifier();
+//
+//        long timePrediction = System.currentTimeMillis();
+//        String bestMatch = bestMatch(response_hist, classifiers);
+//        timePrediction = System.currentTimeMillis() - timePrediction;
 
-        classifiers = loadClassifier();
-
-        long timePrediction = System.currentTimeMillis();
-        String bestMatch = bestMatch(response_hist, classifiers);
-        timePrediction = System.currentTimeMillis() - timePrediction;
-
-        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
+//        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
 
     }
 
-    private void createVocabulary() {
-        Log.d(TAG, "createVocabulary() called");
+
+    public void setVocabulary(File vocabularyFile) {
+        Log.d(TAG, "setVocabulary() called with: vocabularyFile = [" + vocabularyFile.getAbsolutePath() + "]");
         final Mat vocabulary;
         Loader.load(opencv_core.class);
+        Log.d(TAG, "setVocabulary: opencv core");
 
-        File fileVoca = Utils.assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml");
-
-        opencv_core.CvFileStorage storage = opencv_core.cvOpenFileStorage(fileVoca.getAbsolutePath(), null, opencv_core.CV_STORAGE_READ);
+        opencv_core.CvFileStorage storage = opencv_core.cvOpenFileStorage(
+//                Utils.assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml").getAbsolutePath(),
+                vocabularyFile.getAbsolutePath(),
+                null, opencv_core.CV_STORAGE_READ);
         Pointer p = opencv_core.cvReadByName(storage, null, "vocabulary", opencv_core.cvAttrList());
         opencv_core.CvMat cvMat = new opencv_core.CvMat(p);
         vocabulary = new Mat(cvMat);
@@ -90,19 +84,14 @@ public class Classifier {
     }
 
     private Mat computeHist(String imgPath, SIFT detector) {
-
         Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], detector = [" + detector + "]");
         Mat response_hist = new Mat();
         KeyPoint keypoints = new KeyPoint();
         Mat inputDescriptors = new Mat();
 
         Mat matImage = imread(imgPath, 1);
-        Log.d(TAG, "computeHist:: imread");
         detector.detectAndCompute(matImage, Mat.EMPTY, keypoints, inputDescriptors);
-        Log.d(TAG, "computeHist:: keypoint = "+keypoints.toString());
-        Log.d(TAG, "computeHist:: detector");
         mBowide.compute(matImage, keypoints, response_hist);
-        Log.d(TAG, "computeHist:: bowide");
 
         return response_hist;
     }
@@ -136,20 +125,13 @@ public class Classifier {
     }
 
 
-    public void computeImageHist(Uri path){
+    public void computeImageHist(Uri path) {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options),25);
+        Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options), 500);
 
         File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
 
-//        Mat response_hist = computeHist(bitmapFile.getPath(), detector);
-
-        String bestmatch = bestMatch(computeHist(bitmapFile.getPath(), detector),classifiers);
-        Log.d(TAG, "computeImageHist: bestmatch = "+bestmatch);
-
-//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-//        Mat response_hist = computeHist(image.getPath(), detector);
+        Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), detector);
     }
-
 }

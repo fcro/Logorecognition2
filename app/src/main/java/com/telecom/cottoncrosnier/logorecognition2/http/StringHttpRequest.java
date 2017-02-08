@@ -37,7 +37,7 @@ public class StringHttpRequest extends HttpRequest {
 
         Bundle bundle = new Bundle();
         bundle.putString(KEY_STRING, response.toString());
-        bundle.putString(KEY_REQUEST,request);
+        bundle.putString(KEY_REQUEST, request);
         message.setData(bundle);
 
         mHandler.sendMessage(message);
