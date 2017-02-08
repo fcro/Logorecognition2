@@ -43,13 +43,9 @@ public class Classifier {
         mClassName[1] = "Pepsi";
         mClassName[2] = "Sprite";
 
-        String ref = "images/";
-        String imageName = "Coca_12";
+//        String ref = "images/";
+//        String imageName = "Coca_12";
 
-
-        final FlannBasedMatcher matcher = new FlannBasedMatcher();
-
-        mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
 
 //        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
 //        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
@@ -65,11 +61,17 @@ public class Classifier {
     }
 
 
-    public void setVocabulary(File vocabularyFile) {
-        Log.d(TAG, "setVocabulary() called with: vocabularyFile = [" + vocabularyFile.getAbsolutePath() + "]");
+    public void setVoca(File vocabularyFile) {
+
+        Log.d(TAG, "setVoca() called with: vocabularyFile = [" + vocabularyFile.getAbsolutePath() + "]");
+
+        // instancier variable juste avant de les utiliser, pourquoi ? no sé
+        final FlannBasedMatcher matcher = new FlannBasedMatcher();
+        mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
+        //
+
         final Mat vocabulary;
         Loader.load(opencv_core.class);
-        Log.d(TAG, "setVocabulary: opencv core");
 
         opencv_core.CvFileStorage storage = opencv_core.cvOpenFileStorage(
 //                Utils.assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml").getAbsolutePath(),
@@ -81,6 +83,7 @@ public class Classifier {
         opencv_core.cvReleaseFileStorage(storage);
 
         mBowide.setVocabulary(vocabulary);
+        Log.d(TAG, "setVoca() returned: ");
     }
 
     private Mat computeHist(String imgPath, SIFT detector) {
@@ -131,7 +134,6 @@ public class Classifier {
         Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options), 500);
 
         File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
-
         Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), detector);
     }
 }

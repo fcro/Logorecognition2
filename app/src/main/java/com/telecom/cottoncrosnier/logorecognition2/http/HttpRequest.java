@@ -2,6 +2,8 @@ package com.telecom.cottoncrosnier.logorecognition2.http;
 
 import android.content.Context;
 import android.os.Handler;
+import android.util.Log;
+
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -38,8 +40,11 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
     protected abstract void sendMessage(Object response);
 
     @Override
-    public abstract void onResponse(Object response);
+    public  void onResponse(Object response){
+        Log.d(TAG, "onResponse() called with: response = [" + response + "]");
+        sendMessage(response);
+    }
 
     @Override
-    public abstract void onErrorResponse(VolleyError error);
+    public  void onErrorResponse(VolleyError error){}
 }

@@ -51,13 +51,13 @@ public class JsonHttpRequest extends HttpRequest {
         mHandler.sendMessage(message);
     }
 
-    @Override
-    public void onResponse(Object response) {
-        sendMessage(response);
-    }
+//    @Override
+//    public void onResponse(Object response) {
+//        sendMessage(response);
+//    }
 
-    @Override
-    public void onErrorResponse(VolleyError error) {
-
-    }
+//    @Override
+//    public void onErrorResponse(VolleyError error) {
+//
+//    }
 }

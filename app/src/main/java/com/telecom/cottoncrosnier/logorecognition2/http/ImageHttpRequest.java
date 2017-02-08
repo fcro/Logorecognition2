@@ -44,14 +44,14 @@ public class ImageHttpRequest extends HttpRequest {
         mHandler.sendMessage(message);
     }
 
-    @Override
-    public void onResponse(Object response) {
-        Log.d(TAG, "onResponse() called with: response = [" + response + "]");
-        sendMessage(response);
-    }
+//    @Override
+//    public void onResponse(Object response) {
+//        Log.d(TAG, "onResponse() called with: response = [" + response + "]");
+//        sendMessage(response);
+//    }
 
-    @Override
-    public void onErrorResponse(VolleyError error) {
-
-    }
+//    @Override
+//    public void onErrorResponse(VolleyError error) {
+//
+//    }
 }

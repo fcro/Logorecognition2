@@ -1,5 +1,6 @@
 package com.telecom.cottoncrosnier.logorecognition2.Activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -110,7 +111,10 @@ public class MainActivity extends AppCompatActivity {
         fab.setVisibility(View.VISIBLE);
 
 
-        classifier = new Classifier(this.getApplicationContext());
+        Context context = this.getApplicationContext();
+        classifier = new Classifier(context);
+
+//        classifier.setVoca(Utils.assetToCache(context, "vocabulary.yml", "vocabulary.yml"));
 
         sendGetClassifiersRequest();
 
@@ -179,15 +183,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
     private void onStringRequestResult(Bundle data){
-
+        Log.d(TAG, "onStringRequestResult() called ");
         switch (data.getString(HttpRequest.KEY_REQUEST)) {
             case YML_REQUEST:
                 Log.d(TAG, "onStringRequestResult: received vocabulary");
                 try {
                     File vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
                             (String) data.get(StringHttpRequest.KEY_STRING));
-
-                        classifier.setVocabulary(vocabularyFile);
+                    Log.d(TAG, "onStringRequestResult: createVocaFile");
+                        classifier.setVoca(vocabularyFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Utils.toast(this, getString(R.string.error_vocabulary));
@@ -215,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
             JsonParser jsonParser = new JsonParser(jsonData);
-            Log.d(TAG, "handleMessage: brands = " + jsonParser.readBrandArray());
+            Log.d(TAG, "onJSONRequestResult: brands = " + jsonParser.readBrandArray());
             Log.d(TAG, "onJSONRequestResult: vocabulary = " + jsonParser.readVocabulary());
         } catch (JSONException e) {
             e.printStackTrace();
