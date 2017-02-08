@@ -57,4 +57,36 @@ public class FileManager {
             }
         }
     }
+
+    public static File createClassifierFile(File cacheDir, String content, String name) throws IOException{
+        Log.d(TAG, "createClassifierFile() called with: cacheDir = [" + cacheDir + "], content = [" + "..." + "], name = [" +name +"]");
+        File classifierFile = new File(cacheDir.getPath() + "/" + name);
+        long currentFileSize = classifierFile.length();
+        FileWriter fw = new FileWriter(classifierFile, false);
+
+        try {
+            if (classifierFile.createNewFile()) {
+                Log.d(TAG, "createClassifierFile: vocabulary file does not exist");
+                fw.write(content);
+            } else {
+                Log.d(TAG, "createClassifierFile: filesize = " + currentFileSize);
+                long newFileSize = content.length();
+                Log.d(TAG, "createClassifierFile: newfilesize = " + newFileSize);
+                if (newFileSize != currentFileSize) {
+                    fw.write(content);
+                }
+            }
+
+            return classifierFile;
+        } finally {
+            try {
+                fw.flush();
+                Log.d(TAG, "createClassifierFile: flushed");
+                fw.close();
+                Log.d(TAG, "createClassifierFile: closed");
+            } catch (IOException e) {
+                Log.e(TAG, "createClassifierFile: failed flushing/closing filewriter");
+            }
+        }
+    }
 }

@@ -31,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,7 +51,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String CLASSIFIER_SPRITE_REQUEST = "classifiers/Sprite.xml";
     private static final String CLASSIFIER_PESPSI_REQUEST = "classifiers/Pepsi.xml";
 
+    private File vocabularyFile;
+
     private Classifier classifier;
+
+    private File[] classifierFiles;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -110,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         });
         fab.setVisibility(View.VISIBLE);
 
+        classifierFiles = new File[3];
 
         Context context = this.getApplicationContext();
         classifier = new Classifier(context);
@@ -188,27 +194,50 @@ public class MainActivity extends AppCompatActivity {
             case YML_REQUEST:
                 Log.d(TAG, "onStringRequestResult: received vocabulary");
                 try {
-                    File vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
-                            (String) data.get(StringHttpRequest.KEY_STRING));
+                    vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
+                            data.getString(StringHttpRequest.KEY_STRING));
                     Log.d(TAG, "onStringRequestResult: createVocaFile");
-                        classifier.setVoca(vocabularyFile);
+                    classifier.setVoca(vocabularyFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                     Utils.toast(this, getString(R.string.error_vocabulary));
+                    StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
+                    ymlRequest.sendRequest(YML_REQUEST);
                 }
                 break;
 
             case CLASSIFIER_COCA_REQUEST:
                 //XML coca
+                try {
+                    classifierFiles[0] = FileManager.createClassifierFile(getCacheDir(),
+                            data.getString(StringHttpRequest.KEY_STRING),
+                            CLASSIFIER_COCA_REQUEST.replaceAll("/","_"));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 Log.d(TAG, "onStringRequestResult: received coca");
                 break;
             case CLASSIFIER_PESPSI_REQUEST:
                 //XML pepsi
+                try {
+                    classifierFiles[1] = FileManager.createClassifierFile(getCacheDir(),
+                            data.getString(StringHttpRequest.KEY_STRING),
+                            CLASSIFIER_PESPSI_REQUEST.replaceAll("/","_"));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 Log.d(TAG, "onStringRequestResult: received pepsi");
                 break;
 
             case CLASSIFIER_SPRITE_REQUEST:
                 //XML sprite
+                try {
+                    classifierFiles[2] = FileManager.createClassifierFile(getCacheDir(),
+                            data.getString(StringHttpRequest.KEY_STRING),
+                            CLASSIFIER_SPRITE_REQUEST.replaceAll("/","_"));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
                 Log.d(TAG, "onStringRequestResult: received sprite");
                 break;
             
@@ -227,17 +256,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void onImageRequestResult(Bundle data){
-        Log.d(TAG, "handleMessage: request = " + data.getString(HttpRequest.KEY_REQUEST));
+        Log.d(TAG, "onImageRequestResult: request = " + data.getString(HttpRequest.KEY_REQUEST));
         Bitmap img = data.getParcelable(ImageHttpRequest.KEY_IMAGE);
-        Log.d(TAG, "handleMessage: img " + img.toString());
+        Log.d(TAG, "onImageRequestResult: img " + img.toString());
     }
 
 
     private void sendGetClassifiersRequest( ) {
-        StringHttpRequest stringHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
-        stringHttpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
-        stringHttpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
-        stringHttpRequest.sendRequest(CLASSIFIER_SPRITE_REQUEST);
+        //obligé de faire une Requete par classifier sinon requet modifier dans sendRequest
+        StringHttpRequest cocaHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
+        cocaHttpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
+
+        StringHttpRequest pepsiHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
+        pepsiHttpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
+
+        StringHttpRequest spriteRequest = new StringHttpRequest(this, handler, BASE_URL);
+        spriteRequest.sendRequest(CLASSIFIER_SPRITE_REQUEST);
     }
 
     public void startCamera() {
@@ -282,6 +316,8 @@ public class MainActivity extends AppCompatActivity {
 //        Intent startAnalyze = new Intent(MainActivity.this, AnalizePhotoActivity.class);
 //        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
 //        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
-        classifier.computeImageHist(uri);
+//        classifier.setVoca(vocabularyFile);
+        classifier.loadClassifier(classifierFiles);
+        classifier.computeImageHist(uri, vocabularyFile);
     }
 }

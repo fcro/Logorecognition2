@@ -33,11 +33,13 @@ public class Classifier {
     private final int mClassNomber = 3;
     private String[] mClassName = new String[mClassNomber];
     private BOWImgDescriptorExtractor mBowide;
-    private SIFT detector;
+    private SIFT mDetector;
+
+    private CvSVM[] mClassifiers;
 
     public Classifier(Context mainContext) { // TODO rajouter throw filenullexeption
 
-        detector = new SIFT(0, 3, 0.04, 10, 1.6);
+        mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
         mMainContext = mainContext;
         mClassName[0] = "Coca";
         mClassName[1] = "Pepsi";
@@ -48,16 +50,16 @@ public class Classifier {
 
 
 //        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-//        Mat response_hist = computeHist(image.getPath(), detector, mBowide);
+//        Mat response_hist = computeHist(image.getPath(), mDetector, mBowide);
 //
-//        final CvSVM[] classifiers = loadClassifier();
+
 //
 //        long timePrediction = System.currentTimeMillis();
 //        String bestMatch = bestMatch(response_hist, classifiers);
 //        timePrediction = System.currentTimeMillis() - timePrediction;
 
 //        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
-
+//        mClassifiers = loadClassifier();
     }
 
 
@@ -67,7 +69,7 @@ public class Classifier {
 
         // instancier variable juste avant de les utiliser, pourquoi ? no sé
         final FlannBasedMatcher matcher = new FlannBasedMatcher();
-        mBowide = new BOWImgDescriptorExtractor(detector.asDescriptorExtractor(), matcher);
+        mBowide = new BOWImgDescriptorExtractor(mDetector.asDescriptorExtractor(), matcher);
         //
 
         final Mat vocabulary;
@@ -87,14 +89,17 @@ public class Classifier {
     }
 
     private Mat computeHist(String imgPath, SIFT detector) {
-        Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], detector = [" + detector + "]");
+        Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], mDetector = [" + detector + "]");
         Mat response_hist = new Mat();
         KeyPoint keypoints = new KeyPoint();
         Mat inputDescriptors = new Mat();
 
         Mat matImage = imread(imgPath, 1);
+        Log.d(TAG, "computeHist: after imread");
         detector.detectAndCompute(matImage, Mat.EMPTY, keypoints, inputDescriptors);
+        Log.d(TAG, "computeHist: after detectandcompute");
         mBowide.compute(matImage, keypoints, response_hist);
+        Log.d(TAG, "computeHist: afet compute");
 
         return response_hist;
     }
@@ -127,13 +132,33 @@ public class Classifier {
         return classifiers;
     }
 
+    public void loadClassifier(File[] classifierFiles) {
 
-    public void computeImageHist(Uri path) {
+        Log.d(TAG, "loadClassifier() called");
+        final CvSVM[] classifiers;
+        classifiers = new CvSVM[mClassNomber];
+        for (int i = 0; i < mClassNomber; i++) {
+            File classifierFile = classifierFiles[i];
+            classifiers[i] = new CvSVM();
+
+            classifiers[i].load(classifierFile.getAbsolutePath());
+        }
+        mClassifiers =  classifiers;
+    }
+
+
+    public void computeImageHist(Uri path, File vocabularyFile) {
+        Log.d(TAG, "computeImageHist() called with: path = [" + path + "]");
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options), 500);
 
+        Log.d(TAG, "computeImageHist: after scale down");
         File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
-        Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), detector);
+        Log.d(TAG, "computeImageHist: after bitmaptocache");
+        setVoca(vocabularyFile);
+        Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), mDetector);
+        String bestMatch = bestMatch(response_hist, mClassifiers);
+        Log.d(TAG, "computeImageHist: bestMatch = "+bestMatch);
     }
 }
