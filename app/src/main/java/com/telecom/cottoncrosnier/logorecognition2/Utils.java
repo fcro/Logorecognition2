@@ -266,4 +266,14 @@ public class Utils {
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
+
+    public static Brand getBrand(List<Brand> brandList, String brandName) {
+        for (Brand brand : brandList) {
+            if (brand.getBrandName().toLowerCase().equals(brandName.toLowerCase())) {
+                return brand;
+            }
+        }
+
+        return null;
+    }
 }

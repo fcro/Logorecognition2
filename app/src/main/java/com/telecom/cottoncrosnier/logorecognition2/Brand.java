@@ -1,5 +1,6 @@
 package com.telecom.cottoncrosnier.logorecognition2;
 
+import java.io.File;
 import java.io.Serializable;
 
 /**
@@ -14,6 +15,8 @@ public class Brand implements Serializable {
     private final String mUrl;
     private final String mClassifier;
     private final String[] mImages;
+
+    private File mLocalClassifier;
 
 
     /**
@@ -31,6 +34,10 @@ public class Brand implements Serializable {
         this.mImages = images;
     }
 
+
+    public void setLocalClassifier(File classifier) {
+        this.mLocalClassifier = classifier;
+    }
 
     /**
      * Renvoie le nom de la marque.
@@ -55,7 +62,7 @@ public class Brand implements Serializable {
      *
      * @return nom du fichier de classifier.
      */
-    public String getClassifier() {
+    public String getClassifierFile() {
         return mClassifier;
     }
 
@@ -67,6 +74,12 @@ public class Brand implements Serializable {
     public String[] getImages() {
         return mImages;
     }
+
+
+    public File getClassifier() {
+        return mLocalClassifier;
+    }
+
 
     /**
      * Renvoie une chaîne contenant les attributs de la marque.

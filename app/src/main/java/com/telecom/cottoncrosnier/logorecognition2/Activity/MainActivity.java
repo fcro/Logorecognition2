@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.telecom.cottoncrosnier.logorecognition2.Brand;
 import com.telecom.cottoncrosnier.logorecognition2.Classifier;
 import com.telecom.cottoncrosnier.logorecognition2.FileManager;
 import com.telecom.cottoncrosnier.logorecognition2.JsonParser;
@@ -32,6 +33,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,10 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String JSON_REQUEST = "index.json";
     private static final String YML_REQUEST = "vocabulary.yml";
-    private static final String CLASSIFIER_COCA_REQUEST = "classifiers/Coca.xml";
-    private static final String CLASSIFIER_SPRITE_REQUEST = "classifiers/Sprite.xml";
-    private static final String CLASSIFIER_PESPSI_REQUEST = "classifiers/Pepsi.xml";
 
+    private List<Brand> mBrands;
     private File vocabularyFile;
 
     private Classifier classifier;
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             return true;
-            }
+        }
     });
 
 
@@ -122,13 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
 //        classifier.setVoca(Utils.assetToCache(context, "vocabulary.yml", "vocabulary.yml"));
 
-        sendGetClassifiersRequest();
 
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
-
-        StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
-        ymlRequest.sendRequest(YML_REQUEST);
     }
 
     @Override
@@ -183,64 +179,35 @@ public class MainActivity extends AppCompatActivity {
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult: take photo & canceled");
 //            Utils.toast(this,getString(R.string.toast_photo_canceled));
-
         }
-
-
     }
+
     private void onStringRequestResult(Bundle data){
         Log.d(TAG, "onStringRequestResult() called ");
-        switch (data.getString(HttpRequest.KEY_REQUEST)) {
-            case YML_REQUEST:
-                Log.d(TAG, "onStringRequestResult: received vocabulary");
-                try {
-                    vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
-                            data.getString(StringHttpRequest.KEY_STRING));
-                    Log.d(TAG, "onStringRequestResult: createVocaFile");
-                    classifier.setVoca(vocabularyFile);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Utils.toast(this, getString(R.string.error_vocabulary));
-                    StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
-                    ymlRequest.sendRequest(YML_REQUEST);
-                }
-                break;
+        if (data.getString(HttpRequest.KEY_REQUEST).equals(YML_REQUEST)) {
+            Log.d(TAG, "onStringRequestResult: received vocabulary");
+            try {
+                vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
+                        data.getString(StringHttpRequest.KEY_STRING));
+                Log.d(TAG, "onStringRequestResult: createVocaFile");
+                classifier.setVoca(vocabularyFile);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.toast(this, getString(R.string.error_vocabulary));
+                StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
+                ymlRequest.sendRequest(YML_REQUEST);
+            }
+        } else {
+            final String requestedBrand = data.getString(StringHttpRequest.KEY_REQUEST);
+            final String classifierContent = data.getString(StringHttpRequest.KEY_STRING);
+            Log.d(TAG, "onStringRequestResult: brand = " + requestedBrand + " ; content = " + classifierContent);
 
-            case CLASSIFIER_COCA_REQUEST:
-                //XML coca
-                try {
-                    classifierFiles[0] = FileManager.createClassifierFile(getCacheDir(),
-                            data.getString(StringHttpRequest.KEY_STRING),
-                            CLASSIFIER_COCA_REQUEST.replaceAll("/","_"));
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "onStringRequestResult: received coca");
-                break;
-            case CLASSIFIER_PESPSI_REQUEST:
-                //XML pepsi
-                try {
-                    classifierFiles[1] = FileManager.createClassifierFile(getCacheDir(),
-                            data.getString(StringHttpRequest.KEY_STRING),
-                            CLASSIFIER_PESPSI_REQUEST.replaceAll("/","_"));
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "onStringRequestResult: received pepsi");
-                break;
-
-            case CLASSIFIER_SPRITE_REQUEST:
-                //XML sprite
-                try {
-                    classifierFiles[2] = FileManager.createClassifierFile(getCacheDir(),
-                            data.getString(StringHttpRequest.KEY_STRING),
-                            CLASSIFIER_SPRITE_REQUEST.replaceAll("/","_"));
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                Log.d(TAG, "onStringRequestResult: received sprite");
-                break;
-            
+            try {
+                Utils.getBrand(mBrands, requestedBrand).setLocalClassifier(FileManager.createClassifierFile(
+                        getCacheDir(), classifierContent, requestedBrand));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -248,8 +215,11 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
             JsonParser jsonParser = new JsonParser(jsonData);
-            Log.d(TAG, "onJSONRequestResult: brands = " + jsonParser.readBrandArray());
+            mBrands = jsonParser.readBrandArray();
+            Log.d(TAG, "onJSONRequestResult: brands = " + mBrands);
             Log.d(TAG, "onJSONRequestResult: vocabulary = " + jsonParser.readVocabulary());
+
+            getClassifiers();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -262,16 +232,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void sendGetClassifiersRequest( ) {
-        //obligé de faire une Requete par classifier sinon requet modifier dans sendRequest
-        StringHttpRequest cocaHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
-        cocaHttpRequest.sendRequest(CLASSIFIER_COCA_REQUEST);
+    private void getClassifiers() {
+        StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
+        ymlRequest.sendRequest(YML_REQUEST);
 
-        StringHttpRequest pepsiHttpRequest = new StringHttpRequest(this, handler, BASE_URL);
-        pepsiHttpRequest.sendRequest(CLASSIFIER_PESPSI_REQUEST);
-
-        StringHttpRequest spriteRequest = new StringHttpRequest(this, handler, BASE_URL);
-        spriteRequest.sendRequest(CLASSIFIER_SPRITE_REQUEST);
+        for (Brand brand : mBrands) {
+            new StringHttpRequest(this, handler, BASE_URL)
+                    .sendRequest("classifiers/" + brand.getClassifierFile());
+        }
     }
 
     public void startCamera() {
