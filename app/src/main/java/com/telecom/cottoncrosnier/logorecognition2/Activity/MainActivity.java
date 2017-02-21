@@ -184,8 +184,7 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = data.getData();
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
-            Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).asSquare()
-                    .start(this);
+            Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).start(this);
 
         } else if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult:: gallery & canceled");
@@ -195,8 +194,7 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = b.getParcelable(KEY_PHOTO_PATH);
 
             if (imgPath != null) {
-                Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).asSquare()
-                        .start(this);
+                Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).start(this);
                 Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
             }
 
