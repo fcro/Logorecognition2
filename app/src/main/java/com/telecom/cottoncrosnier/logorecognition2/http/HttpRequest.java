@@ -22,8 +22,8 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
 
     public static final String KEY_REQUEST = "key_request";
 
-    protected String mBaseUrl;
-    protected Handler mHandler;
+    static protected String mBaseUrl;
+    static protected Handler mHandler;
 
 
     protected String request;
