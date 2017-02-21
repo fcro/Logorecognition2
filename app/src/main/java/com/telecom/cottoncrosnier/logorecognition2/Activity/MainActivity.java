@@ -1,9 +1,11 @@
 package com.telecom.cottoncrosnier.logorecognition2.Activity;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +49,11 @@ public class MainActivity extends AppCompatActivity {
     public static final String KEY_PHOTO_PATH = "key_path";
     public static final String KEY_URL = "key_url";
 
+    public static final String KEY_BRANDLIST = "key_brandlist";
+    public static final String KEY_VOCA_FILE = "key_vocaFile";
+    public static final String KEY_URI = "key_uri";
+    public static final String KEY_RESPONSE_BRAND = "key_reponse_brand";
+
     private static final int TAKE_PHOTO_REQUEST = 1;
     private static final int GALLERY_IMAGE_REQUEST = 2;
 
@@ -56,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
     private List<Brand> mBrands;
     private File vocabularyFile;
+
+    private BroadcastReceiver mBroadcastReceiver;
 
     private Classifier classifier;
 
@@ -292,27 +302,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startAnalyze(final Uri uri) {
-//        Intent startAnalyze = new Intent(MainActivity.this, AnalizePhotoActivity.class);
-//        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
-//        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
-//        classifier.setVoca(vocabularyFile);
 
         mProgressDialog = ProgressDialog.show(
                 this, getString(R.string.progress_analyzing), getString(R.string.progress_wait));
 
-//        classifier = new Classifier(this,mBrands);
-//        classifier.loadClassifier();
-//        classifier.computeImageHist(uri, vocabularyFile);
+        mBroadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
 
+                Log.d(TAG, "onReceive: "+intent.getSerializableExtra(KEY_RESPONSE_BRAND));
+//                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
+            }
+        };
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
+                new IntentFilter(Classifier.BROADCAST_ACTION_ANALYZE));
         Intent analyzeIntent = new Intent(this, Classifier.class);
 
-        analyzeIntent.putExtra("brandlist", (Serializable) mBrands);
-        analyzeIntent.putExtra("file", vocabularyFile);
-        analyzeIntent.putExtra("uri", uri);
-        analyzeIntent.putExtra("handler", (Parcelable) handler);
-
+        analyzeIntent.putExtra(KEY_BRANDLIST, (Serializable) mBrands);
+        analyzeIntent.putExtra(KEY_VOCA_FILE, vocabularyFile);
+        analyzeIntent.putExtra(KEY_URI, uri);
         startService(analyzeIntent);
-
 
         mProgressDialog.dismiss();
     }

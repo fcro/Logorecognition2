@@ -8,7 +8,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+
+import com.telecom.cottoncrosnier.logorecognition2.Activity.MainActivity;
 
 import static org.bytedeco.javacpp.opencv_highgui.imread;
 
@@ -37,17 +42,12 @@ public class Classifier extends IntentService{
     private BOWImgDescriptorExtractor mBowide;
     private SIFT mDetector;
 
-    private List<Brand> mBrandlist;
     private List<BrandMap> mBrandMapList;
 
-    public Classifier() { // TODO rajouter throw filenullexeption
+    public static final String BROADCAST_ACTION_ANALYZE = "BROADCAST_ACTION_ANALYZE";
 
+    public Classifier() { // TODO rajouter throw filenullexeption
         super("Classifier");
-//        mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
-//        mMainContext = mainContext;
-//
-//        mBrandlist = brandList;
-//        mBrandMapList = new ArrayList<>();
     }
 
 
@@ -107,20 +107,19 @@ public class Classifier extends IntentService{
         return bestMatch;
     }
 
-    public void loadClassifier(){
+    public void loadClassifier(List<Brand> brandList){
         Log.d(TAG, "loadClassifier() called");
 
-        for (Brand brand: mBrandlist) {
+        for (Brand brand: brandList) {
             File classifierFile = brand.getClassifier();
             CvSVM temp = new CvSVM();
             temp.load(classifierFile.getAbsolutePath());
-
             mBrandMapList.add(new BrandMap(temp, brand));
         }
     }
 
 
-    public void computeImageHist(Uri path) {
+    public Brand computeImageHist(Uri path, File vocabularyFile) {
         Log.d(TAG, "computeImageHist() called with: path = [" + path + "]");
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
@@ -129,9 +128,12 @@ public class Classifier extends IntentService{
         Log.d(TAG, "computeImageHist: after scale down");
         File bitmapFile = Utils.bitmapToCache(this, bitmap, path.getLastPathSegment());
         Log.d(TAG, "computeImageHist: after bitmaptocache");
+        setVoca(vocabularyFile);
         Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), mDetector);
         Brand  bestBrand = bestMatch(response_hist);
         Log.d(TAG, "computeImageHist: bestMatch = "+bestBrand.getBrandName());
+
+        return bestBrand;
     }
 
     @Override
@@ -142,28 +144,25 @@ public class Classifier extends IntentService{
 
             Bundle b = intent.getExtras();
 
-            mBrandlist = (List<Brand>) b.get("brandlist");
-
-
-            File vocaFile = (File) b.getSerializable("file");
-            Uri uri = b.getParcelable("uri");
-
-
-            Log.d(TAG, "onHandleIntent: "+vocaFile.getAbsolutePath());
-            Log.d(TAG, "onHandleIntent: "+uri.toString());
-
+            List<Brand> brandlist = (List<Brand>) b.get(MainActivity.KEY_BRANDLIST);
+            File vocaFile = (File) b.getSerializable(MainActivity.KEY_VOCA_FILE);
+            Uri imagePath = b.getParcelable(MainActivity.KEY_URI);
 
             mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
             mBrandMapList = new ArrayList<>();
 
-            setVoca(vocaFile);
-            loadClassifier();
-            computeImageHist(uri);
+            loadClassifier(brandlist);
+            Brand bestBrand = computeImageHist(imagePath,vocaFile);
+
+            onResult(bestBrand);
+
         }
+    }
 
+    private void onResult(Brand bestBrand){
 
-
-
+        Intent localIntent = new Intent(BROADCAST_ACTION_ANALYZE).putExtra(MainActivity.KEY_RESPONSE_BRAND, bestBrand);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
 
