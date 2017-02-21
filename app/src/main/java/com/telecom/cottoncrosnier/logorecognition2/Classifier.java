@@ -133,7 +133,6 @@ public class Classifier {
     }
 
     public void loadClassifier(File[] classifierFiles) {
-
         Log.d(TAG, "loadClassifier() called");
         final CvSVM[] classifiers;
         classifiers = new CvSVM[mClassNomber];
