@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -267,11 +268,22 @@ public class Utils {
     }
 
 
-    public static Brand getBrand(List<Brand> brandList, String brandName) {
+    public static Brand getBrandByName(List<Brand> brandList, String brandName) {
+        Log.d(TAG, "getBrandByName() called with: brandList = [" + brandList + "], brandName = [" + brandName + "]");
         for (Brand brand : brandList) {
             if (brand.getBrandName().toLowerCase().equals(brandName.toLowerCase())) {
                 return brand;
             }
+        }
+
+        return null;
+    }
+
+    public static Brand getBrandByClassifier(List<Brand> brandList, String brandName){
+        Log.d(TAG, "getBrandByClassifier() called with: brandList = [" + brandList+ "], brandName = [" + brandName + "]");
+        for (Brand brand : brandList) {
+            if(brand.getClassifierFile().toLowerCase().equals(brandName.toLowerCase()))
+                return brand;
         }
 
         return null;

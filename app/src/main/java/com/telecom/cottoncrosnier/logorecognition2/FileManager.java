@@ -40,6 +40,7 @@ public class FileManager {
                 Log.d(TAG, "createVocabularyFile: filesize = " + currentFileSize);
                 long newFileSize = content.length();
                 Log.d(TAG, "createVocabularyFile: newfilesize = " + newFileSize);
+                //le bug est la je pense
                 if (newFileSize != currentFileSize) {
                     fw.write(content);
                 }

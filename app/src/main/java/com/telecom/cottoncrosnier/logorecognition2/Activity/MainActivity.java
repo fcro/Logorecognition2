@@ -200,10 +200,10 @@ public class MainActivity extends AppCompatActivity {
         } else {
             final String requestedBrand = data.getString(StringHttpRequest.KEY_REQUEST);
             final String classifierContent = data.getString(StringHttpRequest.KEY_STRING);
-            Log.d(TAG, "onStringRequestResult: brand = " + requestedBrand + " ; content = " + classifierContent);
+//            Log.d(TAG, "onStringRequestResult: brand = " + requestedBrand + " ; content = " + classifierContent);
 
             try {
-                Utils.getBrand(mBrands, requestedBrand).setLocalClassifier(FileManager.createClassifierFile(
+                Utils.getBrandByClassifier(mBrands, requestedBrand).setLocalClassifier(FileManager.createClassifierFile(
                         getCacheDir(), classifierContent, requestedBrand));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -261,7 +261,7 @@ public class MainActivity extends AppCompatActivity {
 //            Photo photo = mPhotoAdapter.getItem(mId);
 //            if(photo != null){
 //                Intent startWebBrowser = new Intent(MainActivity.this, LaunchBrowserActivity.class);
-//                startWebBrowser.putExtra(KEY_URL, photo.getBrand().getUrl().toString());
+//                startWebBrowser.putExtra(KEY_URL, photo.getBrandByName().getUrl().toString());
 //                startActivityForResult(startWebBrowser, VIEW_BROWSER_REQUEST);
 //            }
 //
