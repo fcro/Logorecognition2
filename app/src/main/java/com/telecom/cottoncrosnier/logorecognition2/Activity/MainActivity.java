@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.soundcloud.android.crop.*;
 import com.telecom.cottoncrosnier.logorecognition2.Brand;
 import com.telecom.cottoncrosnier.logorecognition2.Classifier;
 import com.telecom.cottoncrosnier.logorecognition2.FileManager;
@@ -28,7 +29,6 @@ import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.StringHttpRequest;
 import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
-import org.bytedeco.javacpp.opencv_ml;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -55,8 +55,6 @@ public class MainActivity extends AppCompatActivity {
     private File vocabularyFile;
 
     private Classifier classifier;
-
-    private File[] classifierFiles;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -116,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
         });
         fab.setVisibility(View.VISIBLE);
 
-        classifierFiles = new File[3];
-
         Context context = this.getApplicationContext();
         classifier = new Classifier(context, mBrands);
 
@@ -160,26 +156,28 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = data.getData();
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
-            File imgFile = Utils.galleryToCache(this, imgPath, imgPath.getFragment());
-            Uri imgUri = Uri.fromFile(imgFile);
-            startAnalyze(imgUri);
+            Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).asSquare()
+                    .start(this);
 
         } else if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult:: gallery & canceled");
-//            Utils.toast(this,getString(R.string.toast_gallery_canceled));
 
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == RESULT_OK) {
             Bundle b = data.getExtras();
             Uri imgPath = b.getParcelable(KEY_PHOTO_PATH);
 
-            if(imgPath != null){
+            if (imgPath != null) {
+                Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).asSquare()
+                        .start(this);
                 Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
-                startAnalyze(imgPath);
             }
 
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult: take photo & canceled");
-//            Utils.toast(this,getString(R.string.toast_photo_canceled));
+
+        } else if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
+            Log.d(TAG, "onActivityResult: cropped");
+            startAnalyze(Crop.getOutput(data));
         }
     }
 
@@ -232,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
         Bitmap img = data.getParcelable(ImageHttpRequest.KEY_IMAGE);
         Log.d(TAG, "onImageRequestResult: img " + img.toString());
     }
-
 
     private void getClassifiers() {
         StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
