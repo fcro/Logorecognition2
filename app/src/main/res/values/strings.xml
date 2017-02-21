@@ -9,5 +9,6 @@
     <string name="menu_view_web_site">View web Site</string>
     <string name="menu_delete_photo">Delete photo</string>
     <string name="error_vocabulary">Vocabulary not set</string>
+    <string name="vocabulary_set">Vocabulary set</string>
     <string name="error">error</string>
 </resources>

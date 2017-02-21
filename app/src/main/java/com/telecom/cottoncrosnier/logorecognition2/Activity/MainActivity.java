@@ -28,6 +28,7 @@ import com.telecom.cottoncrosnier.logorecognition2.http.JsonHttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.StringHttpRequest;
 import com.telecomlille.cottoncrosnier.logorecognition2.R;
 
+import org.bytedeco.javacpp.opencv_ml;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         classifierFiles = new File[3];
 
         Context context = this.getApplicationContext();
-        classifier = new Classifier(context);
+        classifier = new Classifier(context, mBrands);
 
 //        classifier.setVoca(Utils.assetToCache(context, "vocabulary.yml", "vocabulary.yml"));
 
@@ -191,6 +192,7 @@ public class MainActivity extends AppCompatActivity {
                         data.getString(StringHttpRequest.KEY_STRING));
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
                 classifier.setVoca(vocabularyFile);
+                Utils.toast(this, getString(R.string.vocabulary_set));
             } catch (Exception e) {
                 e.printStackTrace();
                 Utils.toast(this, getString(R.string.error_vocabulary));
@@ -285,7 +287,8 @@ public class MainActivity extends AppCompatActivity {
 //        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
 //        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
 //        classifier.setVoca(vocabularyFile);
-        classifier.loadClassifier(classifierFiles);
+        classifier = new Classifier(this,mBrands);
+        classifier.loadClassifier();
         classifier.computeImageHist(uri, vocabularyFile);
     }
 }

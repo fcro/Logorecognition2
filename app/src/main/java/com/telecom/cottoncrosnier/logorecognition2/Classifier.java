@@ -20,6 +20,8 @@ import org.bytedeco.javacpp.opencv_ml.CvSVM;
 import org.bytedeco.javacpp.opencv_nonfree.SIFT;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by matthieu on 19/01/17.
@@ -30,36 +32,19 @@ public class Classifier {
 
     private final static String TAG = Classifier.class.getSimpleName();
     private Context mMainContext;
-    private final int mClassNomber = 3;
-    private String[] mClassName = new String[mClassNomber];
     private BOWImgDescriptorExtractor mBowide;
     private SIFT mDetector;
 
-    private CvSVM[] mClassifiers;
+    private List<Brand> mBrandlist;
+    private List<BrandMap> mBrandMapList;
 
-    public Classifier(Context mainContext) { // TODO rajouter throw filenullexeption
+    public Classifier(Context mainContext, List<Brand> brandList) { // TODO rajouter throw filenullexeption
 
         mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
         mMainContext = mainContext;
-        mClassName[0] = "Coca";
-        mClassName[1] = "Pepsi";
-        mClassName[2] = "Sprite";
 
-//        String ref = "images/";
-//        String imageName = "Coca_12";
-
-
-//        File image = Utils.assetToCache(mMainContext, ref+imageName+".jpg", imageName+".jpg");
-//        Mat response_hist = computeHist(image.getPath(), mDetector, mBowide);
-//
-
-//
-//        long timePrediction = System.currentTimeMillis();
-//        String bestMatch = bestMatch(response_hist, classifiers);
-//        timePrediction = System.currentTimeMillis() - timePrediction;
-
-//        Log.d(TAG, image.getName() + "  predicted as " + bestMatch + " in " + timePrediction + " ms");
-//        mClassifiers = loadClassifier();
+        mBrandlist = brandList;
+        mBrandMapList = new ArrayList<>();
     }
 
 
@@ -76,7 +61,6 @@ public class Classifier {
         Loader.load(opencv_core.class);
 
         opencv_core.CvFileStorage storage = opencv_core.cvOpenFileStorage(
-//                Utils.assetToCache(mMainContext, "vocabulary.yml", "vocabulary.yml").getAbsolutePath(),
                 vocabularyFile.getAbsolutePath(),
                 null, opencv_core.CV_STORAGE_READ);
         Pointer p = opencv_core.cvReadByName(storage, null, "vocabulary", opencv_core.cvAttrList());
@@ -104,45 +88,32 @@ public class Classifier {
         return response_hist;
     }
 
-    private String bestMatch(Mat response_hist, CvSVM[] classifiers) {
-        Log.d(TAG, "bestMatch() called with: response_hist = [" + response_hist + "], classifiers = [" + classifiers + "]");
+    private Brand bestMatch(Mat response_hist) {
+        Log.d(TAG, "bestMatch() called with: response_hist = [" + response_hist + "], classifiers = []");
         float minf = Float.MAX_VALUE;
-        String bestMatch = null;
-        for (int i = 0; i < mClassNomber; i++) {
-            float res = classifiers[i].predict(response_hist, true);
-            if (res < minf) {
+        Brand bestMatch = null;
+
+        for(BrandMap brandMap : mBrandMapList){
+            float res = brandMap.classifier.predict(response_hist, true);
+            if(res < minf){
                 minf = res;
-                bestMatch = mClassName[i];
+                bestMatch = brandMap.brand;
             }
         }
+
         return bestMatch;
     }
 
-    private CvSVM[] loadClassifier() {
-
+    public void loadClassifier(){
         Log.d(TAG, "loadClassifier() called");
-        final CvSVM[] classifiers;
-        classifiers = new CvSVM[mClassNomber];
-        for (int i = 0; i < mClassNomber; i++) {
-            File classifierFile = Utils.assetToCache(mMainContext, "classifier/" + mClassName[i] + ".xml", mClassName[i] + ".xml");
-            classifiers[i] = new CvSVM();
 
-            classifiers[i].load(classifierFile.getAbsolutePath());
+        for (Brand brand: mBrandlist) {
+            File classifierFile = brand.getClassifier();
+            CvSVM temp = new CvSVM();
+            temp.load(classifierFile.getAbsolutePath());
+
+            mBrandMapList.add(new BrandMap(temp, brand));
         }
-        return classifiers;
-    }
-
-    public void loadClassifier(File[] classifierFiles) {
-        Log.d(TAG, "loadClassifier() called");
-        final CvSVM[] classifiers;
-        classifiers = new CvSVM[mClassNomber];
-        for (int i = 0; i < mClassNomber; i++) {
-            File classifierFile = classifierFiles[i];
-            classifiers[i] = new CvSVM();
-
-            classifiers[i].load(classifierFile.getAbsolutePath());
-        }
-        mClassifiers =  classifiers;
     }
 
 
@@ -157,7 +128,19 @@ public class Classifier {
         Log.d(TAG, "computeImageHist: after bitmaptocache");
         setVoca(vocabularyFile);
         Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), mDetector);
-        String bestMatch = bestMatch(response_hist, mClassifiers);
-        Log.d(TAG, "computeImageHist: bestMatch = "+bestMatch);
+        Brand  bestBrand = bestMatch(response_hist);
+        Log.d(TAG, "computeImageHist: bestMatch = "+bestBrand.getBrandName());
+    }
+
+
+    private class BrandMap{
+
+        private CvSVM classifier;
+        private Brand brand;
+
+        private BrandMap(CvSVM classifier, Brand brand){
+            this.classifier = classifier;
+            this.brand = brand;
+        }
     }
 }
