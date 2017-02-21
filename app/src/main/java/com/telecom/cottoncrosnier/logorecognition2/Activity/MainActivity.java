@@ -7,11 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
@@ -21,12 +23,17 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.soundcloud.android.crop.*;
 import com.telecom.cottoncrosnier.logorecognition2.Brand;
 import com.telecom.cottoncrosnier.logorecognition2.Classifier;
 import com.telecom.cottoncrosnier.logorecognition2.FileManager;
 import com.telecom.cottoncrosnier.logorecognition2.JsonParser;
+import com.telecom.cottoncrosnier.logorecognition2.Photo;
+import com.telecom.cottoncrosnier.logorecognition2.PhotoArrayAdapter;
 import com.telecom.cottoncrosnier.logorecognition2.Utils;
 import com.telecom.cottoncrosnier.logorecognition2.http.HttpRequest;
 import com.telecom.cottoncrosnier.logorecognition2.http.ImageHttpRequest;
@@ -40,6 +47,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int TAKE_PHOTO_REQUEST = 1;
     private static final int GALLERY_IMAGE_REQUEST = 2;
+    private static final int VIEW_BROWSER_REQUEST = 4;
 
     private static final String BASE_URL = "http://www-rech.telecom-lille.fr/nonfreesift/";
 
@@ -67,10 +76,13 @@ public class MainActivity extends AppCompatActivity {
 
     private BroadcastReceiver mBroadcastReceiver;
 
-    private Classifier classifier;
-
     private ProgressDialog mProgressDialog;
 
+    private ArrayList<Photo> mArrayPhoto;
+    private ArrayAdapter<Photo> mPhotoAdapter;
+
+    private static final int INVALID_POSITION = -1;
+    private int mId;
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
@@ -127,17 +139,14 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
                 builder.create().show();
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
             }
         });
         fab.setVisibility(View.VISIBLE);
 
-        Context context = this.getApplicationContext();
-//        classifier = new Classifier(context, mBrands);
-
-//        classifier.setVoca(Utils.assetToCache(context, "vocabulary.yml", "vocabulary.yml"));
-
+        mArrayPhoto = new ArrayList<>();
+        mPhotoAdapter = new PhotoArrayAdapter(
+                this, R.layout.listview_row, mArrayPhoto);
+        initListView();
 
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
@@ -274,28 +283,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startBrowser() {
-//        Log.d(TAG, "onOptionsItemSelected: view website");
-//        if (mId != INVALID_POSITION) {
-//            Photo photo = mPhotoAdapter.getItem(mId);
-//            if(photo != null){
-//                Intent startWebBrowser = new Intent(MainActivity.this, LaunchBrowserActivity.class);
-//                startWebBrowser.putExtra(KEY_URL, photo.getBrandByName().getUrl().toString());
-//                startActivityForResult(startWebBrowser, VIEW_BROWSER_REQUEST);
-//            }
-//
-//        } else {
-//            Utils.toast(this,"please select an item");
-//        }
-    }
+        Log.d(TAG, "onOptionsItemSelected: view website");
+        if (mId != INVALID_POSITION) {
+            Photo photo = mPhotoAdapter.getItem(mId);
+            if(photo != null){
+                Intent startWebBrowser = new Intent(MainActivity.this, LaunchBrowserActivity.class);
+                startWebBrowser.putExtra(KEY_URL, photo.getBrand().getUrl().toString());
+                startActivityForResult(startWebBrowser, VIEW_BROWSER_REQUEST);
+            }
 
-    private void deletePhoto() {
-//        if (mId == INVALID_POSITION) {
-//            Utils.toast(this,"please select an item");
-//            return;
-//        }
-//
-//        mPhotoAdapter.remove(mArrayPhoto.get(mId));
-//        mId = INVALID_POSITION;
+        } else {
+            Utils.toast(this,"please select an item");
+        }
     }
 
     private void startAnalyze(final Uri uri) {
@@ -307,8 +306,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onReceive(Context context, Intent intent) {
 
+                Brand brand = (Brand) intent.getSerializableExtra(KEY_RESPONSE_BRAND);
                 Log.d(TAG, "onReceive: "+intent.getSerializableExtra(KEY_RESPONSE_BRAND));
-//                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
+
+                try{
+                    Bitmap bitmap = ThumbnailUtils.extractThumbnail(
+                            MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
+                            300,
+                            300);
+                    addImage(new Photo(bitmap, brand));
+                }catch (IOException e){
+                    e.printStackTrace();
+                }
+                mProgressDialog.dismiss();
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
@@ -319,7 +329,49 @@ public class MainActivity extends AppCompatActivity {
         analyzeIntent.putExtra(KEY_VOCA_FILE, vocabularyFile);
         analyzeIntent.putExtra(KEY_URI, uri);
         startService(analyzeIntent);
+    }
 
-        mProgressDialog.dismiss();
+    /**
+     * Ajoute une photo à {@link #mPhotoAdapter} pour l'afficher.
+     *
+     * @param photo photo à aafficher
+     */
+    private void addImage(Photo photo) {
+        Log.d(TAG, "addImage() called with: photo = [" + photo.toString() + "]");
+        mPhotoAdapter.add(photo);
+    }
+
+    /**
+     * Supprime une photo de {@link #mPhotoAdapter}.
+     */
+    private void deletePhoto() {
+        if (mId == INVALID_POSITION) {
+            Utils.toast(this,"please select an item");
+            return;
+        }
+
+        mPhotoAdapter.remove(mArrayPhoto.get(mId));
+        mId = INVALID_POSITION;
+    }
+
+
+    /**
+     * Initialise la listView affichant les photos.
+     */
+    private void initListView() {
+        mId = INVALID_POSITION;
+        ListView mPhotoListView = (ListView) findViewById(R.id.img_list_view);
+        mPhotoListView.setAdapter(mPhotoAdapter);
+        mPhotoListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(TAG, "onItemClick: position = [" + position + "] view = [" +
+                        view.getClass().getCanonicalName() + "]");
+                mId = (position == mId ? -1 : position);
+
+                ((PhotoArrayAdapter) mPhotoAdapter).selectRow(mId);
+                mPhotoAdapter.notifyDataSetChanged();
+            }
+        });
     }
 }
