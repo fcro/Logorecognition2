@@ -27,7 +27,7 @@ public class StringHttpRequest extends HttpRequest {
     @Override
     public void sendRequest(String request) {
         mQueue.add(new StringRequest(Request.Method.GET, mBaseUrl + request, this, this));
-        this.request = request;
+        this.request = request.toLowerCase().replace("classifiers/", "").replace(".xml", "");
     }
 
     @Override
