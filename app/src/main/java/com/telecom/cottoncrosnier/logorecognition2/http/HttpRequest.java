@@ -38,7 +38,7 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
 
     @Override
     public  void onResponse(Object response){
-        Log.d(TAG, "onResponse() called with: request = [" + request + "], response = [" + response + "]");
+        Log.d(TAG, "onResponse() called with: request = [" + request + "]");
         sendMessage(response);
     }
 
