@@ -317,6 +317,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 mProgressDialog.dismiss();
+                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
             }
         };
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
