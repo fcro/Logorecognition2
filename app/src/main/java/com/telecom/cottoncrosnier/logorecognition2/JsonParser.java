@@ -28,7 +28,6 @@ public class JsonParser {
         this.mJsonData = jsonData;
     }
 
-
     /**
      * Récupère le nom du fichier de vocabulaire.
      *

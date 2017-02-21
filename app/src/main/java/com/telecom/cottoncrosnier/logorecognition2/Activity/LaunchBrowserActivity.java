@@ -16,6 +16,7 @@ public class LaunchBrowserActivity extends Activity {
 
     private final static int VIEW_BROWSER_REQUEST = 1;
 
+
     /**
      * Appelée au demarrage de l'activité, appelle le demarrage du browser.
      *
@@ -31,6 +32,7 @@ public class LaunchBrowserActivity extends Activity {
 
         launchBrowser(url);
     }
+
     /**
      * Appelée quand l'activité reprend, après avoir quitté le browser.
      *
@@ -67,6 +69,4 @@ public class LaunchBrowserActivity extends Activity {
         Toast.makeText(this, text,
                 Toast.LENGTH_LONG).show();
     }
-
-
 }

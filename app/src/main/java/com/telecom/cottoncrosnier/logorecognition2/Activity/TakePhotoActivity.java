@@ -27,6 +27,7 @@ public class TakePhotoActivity extends Activity {
 
     public static String FILE_NAME = "temp.jpg";
 
+
     /**
      * Appelée au demarrage de l'activité, appelle le démarrage de l'appareil photo.
      *

@@ -10,8 +10,6 @@ import com.android.volley.Request;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-
-
 /**
  * Created by matthieu on 19/01/17.
  */
@@ -23,6 +21,7 @@ public class JsonHttpRequest extends HttpRequest {
 
     private static final String TAG = JsonHttpRequest.class.getSimpleName();
 
+
     public JsonHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
         Log.d(TAG, "JsonHttpRequest() called with: context = [" + context + "], handler = [" + handler + "], baseUrl = [" + baseUrl + "]");
@@ -31,14 +30,13 @@ public class JsonHttpRequest extends HttpRequest {
     @Override
     public void sendRequest(String request) {
         Log.d(TAG, "sendRequest() called with: request = [" + request + "]");
-        mQueue.add(new JsonObjectRequest(Request.Method.GET, mBaseUrl + request,null,this,this) {
+        mQueue.add(new JsonObjectRequest(Request.Method.GET, mBaseUrl + request, null, this, this) {
         });
         this.request = request;
     }
 
     @Override
     protected void sendMessage(Object response) {
-
         Message message = mHandler.obtainMessage();
         message.arg1 = JSON_REQUEST;
 
@@ -50,14 +48,4 @@ public class JsonHttpRequest extends HttpRequest {
 
         mHandler.sendMessage(message);
     }
-
-//    @Override
-//    public void onResponse(Object response) {
-//        sendMessage(response);
-//    }
-
-//    @Override
-//    public void onErrorResponse(VolleyError error) {
-//
-//    }
 }

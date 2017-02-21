@@ -34,7 +34,11 @@ public class Brand implements Serializable {
         this.mImages = images;
     }
 
-
+    /**
+     * Renvoie le fichier de classifier de la marque stocké dans le cache.
+     *
+     * @param classifier fichier classifier dans le cache.
+     */
     public void setLocalClassifier(File classifier) {
         this.mLocalClassifier = classifier;
     }
@@ -69,17 +73,20 @@ public class Brand implements Serializable {
     /**
      * Renvoie la liste des images d'apprentissage de la marque.
      *
-     * @return listes des images d'apprentissage.
+     * @return liste des images d'apprentissage.
      */
     public String[] getImages() {
         return mImages;
     }
 
-
+    /**
+     * Renvoie le nom du fichier de classifier de la marque sur le site web.
+     *
+     * @return nom du fichier de classifier de la marque.
+     */
     public File getClassifier() {
         return mLocalClassifier;
     }
-
 
     /**
      * Renvoie une chaîne contenant les attributs de la marque.

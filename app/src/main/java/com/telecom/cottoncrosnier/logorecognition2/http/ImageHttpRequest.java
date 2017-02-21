@@ -5,9 +5,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 
 /**
@@ -16,10 +14,12 @@ import com.android.volley.toolbox.ImageRequest;
 
 public class ImageHttpRequest extends HttpRequest {
 
+    private static final String TAG = ImageHttpRequest.class.getSimpleName();
+
     public static final int IMAGE_REQUEST = 1111;
     public static final String KEY_IMAGE = "key_image";
 
-    private static final String TAG = ImageHttpRequest.class.getSimpleName();
+
     public ImageHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
     }
@@ -32,7 +32,6 @@ public class ImageHttpRequest extends HttpRequest {
 
     @Override
     protected void sendMessage(Object response) {
-
         Message message = mHandler.obtainMessage();
         message.arg1 = IMAGE_REQUEST;
 
@@ -43,15 +42,4 @@ public class ImageHttpRequest extends HttpRequest {
 
         mHandler.sendMessage(message);
     }
-
-//    @Override
-//    public void onResponse(Object response) {
-//        Log.d(TAG, "onResponse() called with: response = [" + response + "]");
-//        sendMessage(response);
-//    }
-
-//    @Override
-//    public void onErrorResponse(VolleyError error) {
-//
-//    }
 }
