@@ -27,6 +27,10 @@
         <activity android:name="com.telecom.cottoncrosnier.logorecognition2.Activity.LaunchBrowserActivity"/>
 
 
+        <service
+            android:name="com.telecom.cottoncrosnier.logorecognition2.Classifier"
+            android:exported="false"></service>
+
     </application>
 
 </manifest>

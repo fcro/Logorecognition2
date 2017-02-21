@@ -11,4 +11,8 @@
     <string name="error_vocabulary">Vocabulary not set</string>
     <string name="vocabulary_set">Vocabulary set</string>
     <string name="error">error</string>
+
+    <string name="progress_wait">Please wait</string>
+    <string name="progress_analyzing">Analyzing image</string>
+
 </resources>
