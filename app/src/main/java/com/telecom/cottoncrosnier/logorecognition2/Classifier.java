@@ -1,10 +1,13 @@
 package com.telecom.cottoncrosnier.logorecognition2;
 
 
+import android.app.IntentService;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.util.Log;
 
 import static org.bytedeco.javacpp.opencv_highgui.imread;
@@ -27,24 +30,24 @@ import java.util.List;
  * Created by matthieu on 19/01/17.
  */
 
-public class Classifier {
+public class Classifier extends IntentService{
 
 
     private final static String TAG = Classifier.class.getSimpleName();
-    private Context mMainContext;
     private BOWImgDescriptorExtractor mBowide;
     private SIFT mDetector;
 
     private List<Brand> mBrandlist;
     private List<BrandMap> mBrandMapList;
 
-    public Classifier(Context mainContext, List<Brand> brandList) { // TODO rajouter throw filenullexeption
+    public Classifier() { // TODO rajouter throw filenullexeption
 
-        mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
-        mMainContext = mainContext;
-
-        mBrandlist = brandList;
-        mBrandMapList = new ArrayList<>();
+        super("Classifier");
+//        mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
+//        mMainContext = mainContext;
+//
+//        mBrandlist = brandList;
+//        mBrandMapList = new ArrayList<>();
     }
 
 
@@ -117,19 +120,50 @@ public class Classifier {
     }
 
 
-    public void computeImageHist(Uri path, File vocabularyFile) {
+    public void computeImageHist(Uri path) {
         Log.d(TAG, "computeImageHist() called with: path = [" + path + "]");
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         Bitmap bitmap = Utils.scaleBitmapDown(BitmapFactory.decodeFile(path.getPath(), options), 500);
 
         Log.d(TAG, "computeImageHist: after scale down");
-        File bitmapFile = Utils.bitmapToCache(mMainContext, bitmap, path.getLastPathSegment());
+        File bitmapFile = Utils.bitmapToCache(this, bitmap, path.getLastPathSegment());
         Log.d(TAG, "computeImageHist: after bitmaptocache");
-        setVoca(vocabularyFile);
         Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), mDetector);
         Brand  bestBrand = bestMatch(response_hist);
         Log.d(TAG, "computeImageHist: bestMatch = "+bestBrand.getBrandName());
+    }
+
+    @Override
+    protected void onHandleIntent(Intent intent) {
+
+        Log.d(TAG, "onHandleIntent() called with: intent = [" + intent + "]");
+        if(intent != null){
+
+            Bundle b = intent.getExtras();
+
+            mBrandlist = (List<Brand>) b.get("brandlist");
+
+
+            File vocaFile = (File) b.getSerializable("file");
+            Uri uri = b.getParcelable("uri");
+
+
+            Log.d(TAG, "onHandleIntent: "+vocaFile.getAbsolutePath());
+            Log.d(TAG, "onHandleIntent: "+uri.toString());
+
+
+            mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
+            mBrandMapList = new ArrayList<>();
+
+            setVoca(vocaFile);
+            loadClassifier();
+            computeImageHist(uri);
+        }
+
+
+
+
     }
 
 

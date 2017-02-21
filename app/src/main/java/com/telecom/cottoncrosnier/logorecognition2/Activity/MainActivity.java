@@ -1,5 +1,6 @@
 package com.telecom.cottoncrosnier.logorecognition2.Activity;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,6 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -34,6 +36,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -56,6 +59,9 @@ public class MainActivity extends AppCompatActivity {
 
     private Classifier classifier;
 
+    private ProgressDialog mProgressDialog;
+
+
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
@@ -74,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
                     case StringHttpRequest.STRING_REQUEST:
                         onStringRequestResult(msg.getData());
                         break;
+                    case 0:
+                        Brand brand = (Brand) msg.getData().getSerializable("brand");
+                        Log.d(TAG, "handleMessage: "+brand.getBrandName());
                 }
             }
             return true;
@@ -115,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setVisibility(View.VISIBLE);
 
         Context context = this.getApplicationContext();
-        classifier = new Classifier(context, mBrands);
+//        classifier = new Classifier(context, mBrands);
 
 //        classifier.setVoca(Utils.assetToCache(context, "vocabulary.yml", "vocabulary.yml"));
 
@@ -189,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
                         data.getString(StringHttpRequest.KEY_STRING));
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
-                classifier.setVoca(vocabularyFile);
+//                classifier.setVoca(vocabularyFile);
                 Utils.toast(this, getString(R.string.vocabulary_set));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -279,13 +288,29 @@ public class MainActivity extends AppCompatActivity {
 //        mId = INVALID_POSITION;
     }
 
-    private void startAnalyze(Uri uri) {
+    private void startAnalyze(final Uri uri) {
 //        Intent startAnalyze = new Intent(MainActivity.this, AnalizePhotoActivity.class);
 //        startAnalyze.putExtra(KEY_PHOTO_PATH, uri);
 //        startActivityForResult(startAnalyze, ANALYZE_PHOTO_REQUEST);
 //        classifier.setVoca(vocabularyFile);
-        classifier = new Classifier(this,mBrands);
-        classifier.loadClassifier();
-        classifier.computeImageHist(uri, vocabularyFile);
+
+        mProgressDialog = ProgressDialog.show(
+                this, getString(R.string.progress_analyzing), getString(R.string.progress_wait));
+
+//        classifier = new Classifier(this,mBrands);
+//        classifier.loadClassifier();
+//        classifier.computeImageHist(uri, vocabularyFile);
+
+        Intent analyzeIntent = new Intent(this, Classifier.class);
+
+        analyzeIntent.putExtra("brandlist", (Serializable) mBrands);
+        analyzeIntent.putExtra("file", vocabularyFile);
+        analyzeIntent.putExtra("uri", uri);
+        analyzeIntent.putExtra("handler", (Parcelable) handler);
+
+        startService(analyzeIntent);
+
+
+        mProgressDialog.dismiss();
     }
 }
