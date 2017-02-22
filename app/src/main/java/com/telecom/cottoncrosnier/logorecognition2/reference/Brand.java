@@ -27,7 +27,7 @@ public class Brand implements Serializable {
      * @param classifier nom du fichier de classifier de la marque.
      * @param images     liste des images d'apprentissage de la marque.
      */
-    Brand(String brandName, String url, String classifier, String[] images) {
+    public Brand(String brandName, String url, String classifier, String[] images) {
         this.mBrandName = brandName;
         this.mUrl = url;
         this.mClassifier = classifier;
