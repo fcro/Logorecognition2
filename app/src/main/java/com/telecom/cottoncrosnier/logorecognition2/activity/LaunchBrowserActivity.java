@@ -11,7 +11,7 @@ import android.widget.Toast;
  * Activité permettant l'affichage d'un browser
  */
 public class LaunchBrowserActivity extends Activity {
-
+//test
     private static final String TAG = LaunchBrowserActivity.class.getSimpleName();
 
     private final static int VIEW_BROWSER_REQUEST = 1;
@@ -31,7 +31,7 @@ public class LaunchBrowserActivity extends Activity {
         String url = b.getString(MainActivity.KEY_URL);
 
         launchBrowser(url);
-        //test
+        //testxsokxoskx
     }
 
     /**
