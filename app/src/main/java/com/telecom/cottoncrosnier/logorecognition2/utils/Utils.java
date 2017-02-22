@@ -1,4 +1,4 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.utils;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,6 +10,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import com.telecom.cottoncrosnier.logorecognition2.reference.Brand;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

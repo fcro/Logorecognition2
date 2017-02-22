@@ -1,19 +1,18 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.service;
 
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import com.telecom.cottoncrosnier.logorecognition2.Activity.MainActivity;
+import com.telecom.cottoncrosnier.logorecognition2.reference.Brand;
+import com.telecom.cottoncrosnier.logorecognition2.activity.MainActivity;
+import com.telecom.cottoncrosnier.logorecognition2.utils.Utils;
 
 import static org.bytedeco.javacpp.opencv_highgui.imread;
 
@@ -35,10 +34,10 @@ import java.util.List;
  * Created by matthieu on 19/01/17.
  */
 
-public class Classifier extends IntentService{
+public class AnalyseService extends IntentService{
 
 
-    private final static String TAG = Classifier.class.getSimpleName();
+    private final static String TAG = AnalyseService.class.getSimpleName();
     private BOWImgDescriptorExtractor mBowide;
     private SIFT mDetector;
 
@@ -46,8 +45,8 @@ public class Classifier extends IntentService{
 
     public static final String BROADCAST_ACTION_ANALYZE = "BROADCAST_ACTION_ANALYZE";
 
-    public Classifier() { // TODO rajouter throw filenullexeption
-        super("Classifier");
+    public AnalyseService() { // TODO rajouter throw filenullexeption
+        super("AnalyseService");
     }
 
 

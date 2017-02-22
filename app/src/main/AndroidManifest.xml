@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name="com.telecom.cottoncrosnier.logorecognition2.Activity.MainActivity"
+            android:name="com.telecom.cottoncrosnier.logorecognition2.activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -23,12 +23,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.Activity.TakePhotoActivity" />
-        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.Activity.LaunchBrowserActivity" />
+        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.activity.TakePhotoActivity" />
+        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.activity.LaunchBrowserActivity" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
 
         <service
-            android:name="com.telecom.cottoncrosnier.logorecognition2.Classifier"
+            android:name="com.telecom.cottoncrosnier.logorecognition2.service.AnalyseService"
             android:exported="false"></service>
 
     </application>

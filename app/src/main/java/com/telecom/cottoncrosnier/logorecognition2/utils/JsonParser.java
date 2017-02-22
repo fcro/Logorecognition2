@@ -1,4 +1,6 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.utils;
+
+import com.telecom.cottoncrosnier.logorecognition2.reference.Brand;
 
 import org.json.JSONArray;
 import org.json.JSONException;

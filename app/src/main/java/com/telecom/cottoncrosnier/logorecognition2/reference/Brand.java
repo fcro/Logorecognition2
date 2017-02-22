@@ -1,4 +1,4 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.reference;
 
 import java.io.File;
 import java.io.Serializable;

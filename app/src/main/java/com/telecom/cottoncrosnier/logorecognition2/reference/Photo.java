@@ -1,4 +1,4 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.reference;
 
 import android.graphics.Bitmap;
 

@@ -1,4 +1,4 @@
-package com.telecom.cottoncrosnier.logorecognition2;
+package com.telecom.cottoncrosnier.logorecognition2.utils;
 
 import android.util.Log;
 
