@@ -215,10 +215,10 @@ public class MainActivity extends AppCompatActivity {
                         data.getString(StringHttpRequest.KEY_STRING));
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
 //                classifier.setVoca(vocabularyFile);
-                Utils.toast(this, getString(R.string.init_ok));
+                Utils.toast(this, getString(R.string.vocabulary_set));
             } catch (Exception e) {
                 e.printStackTrace();
-                Utils.toast(this, getString(R.string.init_nok));
+                Utils.toast(this, getString(R.string.error_vocabulary));
                 StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
                 ymlRequest.sendRequest(YML_REQUEST);
             }
