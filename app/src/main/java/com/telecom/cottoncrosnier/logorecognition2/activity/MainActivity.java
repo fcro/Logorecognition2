@@ -68,9 +68,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL = "http://www-rech.telecom-lille.fr/nonfreesift/";
 
     private static final String JSON_REQUEST = "index.json";
-    private static final String YML_REQUEST = "vocabulary.yml";
 
     private List<Brand> mBrands;
+    private String mVocabularyName;
     private File vocabularyFile;
 
     private BroadcastReceiver mBroadcastReceiver;
@@ -208,24 +208,22 @@ public class MainActivity extends AppCompatActivity {
 
     private void onStringRequestResult(Bundle data){
         Log.d(TAG, "onStringRequestResult() called ");
-        if (data.getString(HttpRequest.KEY_REQUEST).equals(YML_REQUEST)) {
+        if (data.getString(HttpRequest.KEY_REQUEST).equals(mVocabularyName)) {
             Log.d(TAG, "onStringRequestResult: received vocabulary");
             try {
                 vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
                         data.getString(StringHttpRequest.KEY_STRING));
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
-//                classifier.setVoca(vocabularyFile);
                 Utils.toast(this, getString(R.string.vocabulary_set));
             } catch (Exception e) {
                 e.printStackTrace();
                 Utils.toast(this, getString(R.string.error_vocabulary));
                 StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
-                ymlRequest.sendRequest(YML_REQUEST);
+                ymlRequest.sendRequest(mVocabularyName);
             }
         } else {
             final String requestedBrand = data.getString(StringHttpRequest.KEY_REQUEST);
             final String classifierContent = data.getString(StringHttpRequest.KEY_STRING);
-//            Log.d(TAG, "onStringRequestResult: brand = " + requestedBrand + " ; content = " + classifierContent);
 
             try {
                 Utils.getBrandByClassifier(mBrands, requestedBrand).setLocalClassifier(FileManager.createClassifierFile(
@@ -241,10 +239,12 @@ public class MainActivity extends AppCompatActivity {
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
             JsonParser jsonParser = new JsonParser(jsonData);
             mBrands = jsonParser.readBrandArray();
+            mVocabularyName = jsonParser.readVocabulary();
             Log.d(TAG, "onJSONRequestResult: brands = " + mBrands);
-            Log.d(TAG, "onJSONRequestResult: vocabulary = " + jsonParser.readVocabulary());
+            Log.d(TAG, "onJSONRequestResult: vocabulary = " + mVocabularyName);
 
             getClassifiers();
+            getVocabulary();
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -257,13 +257,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void getClassifiers() {
-        StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
-        ymlRequest.sendRequest(YML_REQUEST);
-
         for (Brand brand : mBrands) {
             new StringHttpRequest(this, handler, BASE_URL)
                     .sendRequest("classifiers/" + brand.getClassifierFile());
         }
+    }
+
+    private void getVocabulary() {
+        new StringHttpRequest(this, handler, BASE_URL)
+                .sendRequest(mVocabularyName);
     }
 
     public void startCamera() {
