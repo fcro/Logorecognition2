@@ -15,7 +15,8 @@
         <activity
             android:name="com.telecom.cottoncrosnier.logorecognition2.activity.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,9 +24,15 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.activity.TakePhotoActivity" />
-        <activity android:name="com.telecom.cottoncrosnier.logorecognition2.activity.LaunchBrowserActivity" />
-        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+        <activity
+            android:name="com.telecom.cottoncrosnier.logorecognition2.activity.TakePhotoActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.telecom.cottoncrosnier.logorecognition2.activity.LaunchBrowserActivity"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name="com.soundcloud.android.crop.CropImageActivity"
+            android:screenOrientation="portrait"/>
 
         <service
             android:name="com.telecom.cottoncrosnier.logorecognition2.service.AnalyseService"
