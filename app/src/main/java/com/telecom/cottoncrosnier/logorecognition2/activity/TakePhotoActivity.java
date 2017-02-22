@@ -37,7 +37,6 @@ public class TakePhotoActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         startCamera();
-        //testede
     }
 
     /**

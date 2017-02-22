@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-//test
+
     private static final String TAG = MainActivity.class.getSimpleName();
 
     public static final String KEY_PHOTO_PATH = "key_path";
