@@ -31,6 +31,7 @@ public class LaunchBrowserActivity extends Activity {
         String url = b.getString(MainActivity.KEY_URL);
 
         launchBrowser(url);
+        //test
     }
 
     /**
