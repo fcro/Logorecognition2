@@ -26,7 +26,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.soundcloud.android.crop.*;
 import com.telecom.cottoncrosnier.logorecognition2.service.AnalyseService;
 import com.telecom.cottoncrosnier.logorecognition2.reference.Brand;
 import com.telecom.cottoncrosnier.logorecognition2.utils.FileManager;
@@ -73,8 +72,6 @@ public class MainActivity extends AppCompatActivity {
     private List<Brand> mBrands;
     private String mVocabularyName;
     private File vocabularyFile;
-
-    private BroadcastReceiver mBroadcastReceiver;
 
     private ProgressDialog mProgressDialog;
 
@@ -150,6 +147,8 @@ public class MainActivity extends AppCompatActivity {
 
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
+
+        setBroadcastReceiver();
     }
 
     @Override
@@ -181,7 +180,8 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_OK) {
-            Uri imgPath = data.getData();
+            Uri galleryImgPath = data.getData();
+            Uri imgPath = Uri.fromFile(Utils.galleryToCache(this, galleryImgPath, "temp"));
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
             Intent editImageIntent = new Intent(this, EditImageActivity.class);
@@ -300,38 +300,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void startAnalyze(final Uri uri) {
-
-        mProgressDialog = ProgressDialog.show(
-                this, getString(R.string.progress_analyzing), getString(R.string.progress_wait));
-
-        mBroadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-
-                Brand brand = (Brand) intent.getSerializableExtra(KEY_RESPONSE_BRAND);
-                Log.d(TAG, "onReceive: "+intent.getSerializableExtra(KEY_RESPONSE_BRAND));
-
-                try{
-                    Bitmap bitmap = ThumbnailUtils.extractThumbnail(
-                            MediaStore.Images.Media.getBitmap(getContentResolver(), uri),
-                            300,
-                            300);
-                    addImage(new Photo(bitmap, brand));
-                }catch (IOException e){
-                    e.printStackTrace();
-                }
-                mProgressDialog.dismiss();
-                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
-            }
-        };
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver,
-                new IntentFilter(AnalyseService.BROADCAST_ACTION_ANALYZE));
         Intent analyzeIntent = new Intent(this, AnalyseService.class);
 
         analyzeIntent.putExtra(KEY_BRANDLIST, (Serializable) mBrands);
         analyzeIntent.putExtra(KEY_VOCA_FILE, vocabularyFile);
         analyzeIntent.putExtra(KEY_URI, uri);
         startService(analyzeIntent);
+
+        mProgressDialog = ProgressDialog.show(
+                this, getString(R.string.progress_analyzing), getString(R.string.progress_wait));
     }
 
     /**
@@ -376,5 +353,35 @@ public class MainActivity extends AppCompatActivity {
                 mPhotoAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+
+    private void setBroadcastReceiver() {
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                Brand brand = (Brand) intent.getSerializableExtra(KEY_RESPONSE_BRAND);
+                Uri imgPath = intent.getParcelableExtra(KEY_PHOTO_PATH);
+                Log.d(TAG, "onReceive: brand = " + intent.getSerializableExtra(KEY_RESPONSE_BRAND)
+                        + " ; imgPath = " + imgPath);
+
+                try {
+                    Bitmap bitmap = ThumbnailUtils.extractThumbnail(
+                            MediaStore.Images.Media.getBitmap(getContentResolver(), imgPath),
+                            300,
+                            300);
+                    addImage(new Photo(bitmap, brand));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                mProgressDialog.dismiss();
+
+//                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
+            }
+        };
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                new IntentFilter(AnalyseService.BROADCAST_ACTION_ANALYZE));
     }
 }

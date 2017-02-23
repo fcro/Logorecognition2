@@ -50,7 +50,7 @@ public class AnalyseService extends IntentService{
     }
 
 
-    public void setVoca(File vocabularyFile) {
+    private void setVoca(File vocabularyFile) {
 
         Log.d(TAG, "setVoca() called with: vocabularyFile = [" + vocabularyFile.getAbsolutePath() + "]");
 
@@ -145,22 +145,22 @@ public class AnalyseService extends IntentService{
 
             List<Brand> brandlist = (List<Brand>) b.get(MainActivity.KEY_BRANDLIST);
             File vocaFile = (File) b.getSerializable(MainActivity.KEY_VOCA_FILE);
-            Uri imagePath = b.getParcelable(MainActivity.KEY_URI);
+            Uri imgPath = b.getParcelable(MainActivity.KEY_URI);
 
             mDetector = new SIFT(0, 3, 0.04, 10, 1.6);
             mBrandMapList = new ArrayList<>();
 
             loadClassifier(brandlist);
-            Brand bestBrand = computeImageHist(imagePath,vocaFile);
+            Brand bestBrand = computeImageHist(imgPath, vocaFile);
 
-            onResult(bestBrand);
-
+            onResult(bestBrand, imgPath);
         }
     }
 
-    private void onResult(Brand bestBrand){
-
-        Intent localIntent = new Intent(BROADCAST_ACTION_ANALYZE).putExtra(MainActivity.KEY_RESPONSE_BRAND, bestBrand);
+    private void onResult(Brand bestBrand, Uri imgPath){
+        Intent localIntent = new Intent(BROADCAST_ACTION_ANALYZE)
+                .putExtra(MainActivity.KEY_RESPONSE_BRAND, bestBrand)
+                .putExtra(MainActivity.KEY_PHOTO_PATH, imgPath);
         LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
     }
 
