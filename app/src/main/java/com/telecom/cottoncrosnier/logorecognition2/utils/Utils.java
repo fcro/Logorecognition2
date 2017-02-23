@@ -3,7 +3,6 @@ package com.telecom.cottoncrosnier.logorecognition2.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
@@ -95,46 +94,6 @@ public class Utils {
 
 
     /**
-     * Copie un fichier des assets vers le cache de l'application.
-     *
-     * @param context contexte de l'application pour récupérer le dossier de cache.
-     * @param assetPath chemin vers le fichier dans les assets à copier.
-     * @param fileName nom du fichier de destination.
-     * @return fichier copié dans le cache de l'application.
-     */
-    public static File assetToCache(Context context, String assetPath, String fileName) {
-        InputStream is;
-        FileOutputStream fos;
-        int size;
-        byte[] buffer;
-        String filePath = context.getCacheDir() + "/" + fileName;
-        File file = new File(filePath);
-        AssetManager assetManager = context.getAssets();
-
-        try {
-            is = assetManager.open(assetPath);
-            size = is.available();
-            buffer = new byte[size];
-
-            if (is.read(buffer) <= 0) {
-                return null;
-            }
-
-            is.close();
-
-            fos = new FileOutputStream(filePath);
-            fos.write(buffer);
-            fos.close();
-
-            return file;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    /**
      * Copie un fichier de la galerie vers le cache de l'application.
      *
      * @param context contexte de l'application pour récupérer le dossier de cache.
@@ -211,27 +170,6 @@ public class Utils {
 
 
     /**
-     * Renvoie la liste des noms des fichiers commençant par {@code prefix}. Cette méthode sert à
-     * associer toutes les images d'une marque à un même objet {@link Brand}.
-     *
-     * @param files liste des fichiers parmi lesquels chercher.
-     * @param prefix préfixe attendu dans la liste retournée.
-     * @return liste des noms de fichiers commençant par {@code prefix}.
-     */
-    public static List<String> filesStartWith(String[] files, String prefix) {
-        List<String> fileList = new ArrayList<String>();
-
-        for (String file : files) {
-            if (file.startsWith(prefix)) {
-                fileList.add(file);
-            }
-        }
-
-        return fileList;
-    }
-
-
-    /**
      * Affiche une notification Toast.
      *
      * @param context contexte appelant.
@@ -269,17 +207,6 @@ public class Utils {
         return Bitmap.createScaledBitmap(bitmap, resizedWidth, resizedHeight, false);
     }
 
-
-    public static Brand getBrandByName(List<Brand> brandList, String brandName) {
-        Log.d(TAG, "getBrandByName() called with: brandList = [" + brandList + "], brandName = [" + brandName + "]");
-        for (Brand brand : brandList) {
-            if (brand.getBrandName().toLowerCase().equals(brandName.toLowerCase())) {
-                return brand;
-            }
-        }
-
-        return null;
-    }
 
     public static Brand getBrandByClassifier(List<Brand> brandList, String brandName){
         Log.d(TAG, "getBrandByClassifier() called with: brandList = [" + brandList+ "], brandName = [" + brandName + "]");
