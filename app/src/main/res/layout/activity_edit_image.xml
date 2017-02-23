@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="1" >
 
 
     <ImageView
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_marginBottom="80dp"
-        android:id="@+id/image_view" />
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:id="@+id/image_view"
+        android:scaleType="centerInside" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -20,8 +22,8 @@
         <Button
             android:text="@string/button_crop"
             android:id="@+id/button_crop"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="start"
             android:textAlignment="center"
@@ -30,8 +32,8 @@
         <Button
             android:text="@string/button_analyse"
             android:id="@+id/button_analyse"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="end"
             android:textAlignment="center"

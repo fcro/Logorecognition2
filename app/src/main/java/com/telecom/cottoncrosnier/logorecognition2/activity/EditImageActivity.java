@@ -29,11 +29,6 @@ public class EditImageActivity extends Activity {
     private Uri mImgPath;
 
 
-    /**
-     * Appelée au demarrage de l'activité, initialise l'affichage et appelle l'analyse de la photo.
-     *
-     * @param savedInstanceState Éléments sauvegardés lors du dernier arrêt de l'activité (non utilisé).
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +45,7 @@ public class EditImageActivity extends Activity {
         mImgPath = b.getParcelable(MainActivity.KEY_PHOTO_PATH);
 
         mImageView.setImageURI(mImgPath);
-        setButtonListener(mImgPath);
+        setButtonListener();
     }
 
 
@@ -59,17 +54,18 @@ public class EditImageActivity extends Activity {
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
             Log.d(TAG, "onActivityResult: cropped");
             mImgPath = Crop.getOutput(data);
+            mImageView.setImageDrawable(null);
             mImageView.setImageURI(mImgPath);
         }
     }
 
 
-    private void setButtonListener(final Uri imgPath){
+    private void setButtonListener() {
         mButtonCrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri croppedImgPath = Uri.fromFile(new File(getCacheDir() + "/crop"));
-                Crop.of(imgPath, croppedImgPath).start(EditImageActivity.this);
+                Crop.of(mImgPath, croppedImgPath).start(EditImageActivity.this);
             }
         });
 
@@ -78,7 +74,7 @@ public class EditImageActivity extends Activity {
             public void onClick(View v) {
                 Intent resultIntent = new Intent();
 
-                resultIntent.setData(imgPath);
+                resultIntent.setData(mImgPath);
                 setResult(RESULT_OK, resultIntent);
                 finish();
             }
