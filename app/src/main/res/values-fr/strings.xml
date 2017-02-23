@@ -12,4 +12,5 @@
     <string name="progress_analyzing">Analyse en cours</string>
     <string name="progress_wait">Veuillez patienter</string>
     <string name="init_ok">Application initialisée</string>
+    <string name="button_crop">Crop image</string>
 </resources>

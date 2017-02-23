@@ -14,5 +14,7 @@
 
     <string name="progress_wait">Please wait</string>
     <string name="progress_analyzing">Analyzing image</string>
+    <string name="button_crop">Crop image</string>
+    <string name="button_analyse">Analyse image</string>
 
 </resources>

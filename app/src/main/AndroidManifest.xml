@@ -31,6 +31,9 @@
             android:name="com.telecom.cottoncrosnier.logorecognition2.activity.LaunchBrowserActivity"
             android:screenOrientation="portrait"/>
         <activity
+            android:name="com.telecom.cottoncrosnier.logorecognition2.activity.EditImageActivity"
+            android:screenOrientation="portrait"/>
+        <activity
             android:name="com.soundcloud.android.crop.CropImageActivity"
             android:screenOrientation="portrait"/>
 

@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int TAKE_PHOTO_REQUEST = 1;
     private static final int GALLERY_IMAGE_REQUEST = 2;
+    private static final int EDIT_IMAGE_REQUEST = 3;
     private static final int VIEW_BROWSER_REQUEST = 4;
 
     private static final String BASE_URL = "http://www-rech.telecom-lille.fr/nonfreesift/";
@@ -183,7 +184,9 @@ public class MainActivity extends AppCompatActivity {
             Uri imgPath = data.getData();
             Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
-            Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).start(this);
+            Intent editImageIntent = new Intent(this, EditImageActivity.class);
+            editImageIntent.putExtra(KEY_PHOTO_PATH, imgPath);
+            startActivityForResult(editImageIntent, EDIT_IMAGE_REQUEST);
 
         } else if (requestCode == GALLERY_IMAGE_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult:: gallery & canceled");
@@ -192,17 +195,17 @@ public class MainActivity extends AppCompatActivity {
             Bundle b = data.getExtras();
             Uri imgPath = b.getParcelable(KEY_PHOTO_PATH);
 
-            if (imgPath != null) {
-                Crop.of(imgPath, Uri.fromFile(new File(getCacheDir() + "/crop"))).start(this);
-                Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
-            }
+            Intent editImageIntent = new Intent(this, EditImageActivity.class);
+            editImageIntent.putExtra(KEY_PHOTO_PATH, imgPath);
+            startActivityForResult(editImageIntent, EDIT_IMAGE_REQUEST);
+            Log.d(TAG, "onActivityResult:: imgPath = " + imgPath.toString());
 
         } else if (requestCode == TAKE_PHOTO_REQUEST && resultCode == RESULT_CANCELED) {
             Log.d(TAG, "onActivityResult: take photo & canceled");
 
-        } else if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-            Log.d(TAG, "onActivityResult: cropped");
-            startAnalyze(Crop.getOutput(data));
+        } else if (requestCode == EDIT_IMAGE_REQUEST && resultCode == RESULT_OK) {
+            Log.d(TAG, "onActivityResult: edit image request & ok");
+            startAnalyze(data.getData());
         }
     }
 
