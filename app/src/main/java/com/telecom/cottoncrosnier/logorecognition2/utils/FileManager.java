@@ -2,19 +2,34 @@ package com.telecom.cottoncrosnier.logorecognition2.utils;
 
 import android.util.Log;
 
+import com.telecom.cottoncrosnier.logorecognition2.activity.MainActivity;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
-/**
- * Created by User on 21/01/2017.
- */
 
 public class FileManager {
 
     private static final String TAG = FileManager.class.getSimpleName();
 
+    private static final int CREATE_CLASSIFIER = 0;
+    private static final int CREATE_VOCABULARY = 1;
 
+    private int[] mFileCount;
+    private int mBrandsNumber;
+
+    private MainActivity mMainActivity;
+
+
+    public FileManager(MainActivity mainActivity) {
+        this.mMainActivity = mainActivity;
+        mFileCount = new int[2];
+    }
+
+
+    public void setBrandsNumber(int brandsNumber) {
+        mBrandsNumber = brandsNumber;
+    }
     /**
      * Crée le fichier de vocabulaire vocabulary.yml avec comme contenu {@code content}. Retourne
      * toujours le fichier de vocabulaire.
@@ -25,13 +40,15 @@ public class FileManager {
      * @throws IOException si une erreur se produit pendant la lecture ou l'écriture du fichier
      * vocabulary.yml.
      */
-    public static File createVocabularyFile(File cacheDir, String content) throws IOException {
+    public File createVocabularyFile(File cacheDir, String content) throws IOException {
         Log.d(TAG, "createVocabularyFile() called with: cacheDir = [" + cacheDir + "], content = [" + "..." + "]");
         File vocabularyFile = new File(cacheDir.getPath() + "/vocabulary.yml");
         FileWriter fw = new FileWriter(vocabularyFile, false);
 
         try {
             fw.write(content);
+            mFileCount[CREATE_VOCABULARY]++;
+            checkIsComplete();
 
             return vocabularyFile;
         } finally {
@@ -43,13 +60,15 @@ public class FileManager {
         }
     }
 
-    public static File createClassifierFile(File cacheDir, String content, String name) throws IOException{
+    public File createClassifierFile(File cacheDir, String content, String name) throws IOException{
         Log.d(TAG, "createClassifierFile() called with: cacheDir = [" + cacheDir + "], content = [" + "..." + "], name = [" +name +"]");
         File classifierFile = new File(cacheDir.getPath() + "/" + name);
         FileWriter fw = new FileWriter(classifierFile, false);
 
         try {
             fw.write(content);
+            mFileCount[CREATE_CLASSIFIER]++;
+            checkIsComplete();
 
             return classifierFile;
         } finally {
@@ -58,6 +77,13 @@ public class FileManager {
             } catch (IOException e) {
                 Log.e(TAG, "createClassifierFile: failed flushing/closing filewriter");
             }
+        }
+    }
+
+    private void checkIsComplete() {
+        if (mFileCount[0] ==  mBrandsNumber && mFileCount[1] == 1) {
+            Log.d(TAG, "checkIsComplete: isComplete");
+            mMainActivity.initFab();
         }
     }
 }

@@ -78,6 +78,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Photo> mArrayPhoto;
     private ArrayAdapter<Photo> mPhotoAdapter;
 
+    private FileManager mFileManager;
+
     private static final int INVALID_POSITION = -1;
     private int mId;
 
@@ -116,34 +118,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder
-                        .setMessage(R.string.dialog_select_prompt)
-                        .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startGalleryChooser();
-                            }
-                        })
-                        .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                startCamera();
-                            }
-                        });
-                builder.create().show();
-            }
-        });
-        fab.setVisibility(View.VISIBLE);
-
         mArrayPhoto = new ArrayList<>();
         mPhotoAdapter = new PhotoArrayAdapter(
                 this, R.layout.listview_row, mArrayPhoto);
         initListView();
+
+        mFileManager = new FileManager(this);
 
         JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
         jsonHttpRequest.sendRequest(JSON_REQUEST);
@@ -214,9 +194,9 @@ public class MainActivity extends AppCompatActivity {
         if (data.getString(HttpRequest.KEY_REQUEST).equals(mVocabularyName)) {
             Log.d(TAG, "onStringRequestResult: received vocabulary");
             try {
-                vocabularyFile = FileManager.createVocabularyFile(getCacheDir(),
-                        data.getString(StringHttpRequest.KEY_STRING));
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
+                vocabularyFile = mFileManager.createVocabularyFile(getCacheDir(),
+                        data.getString(StringHttpRequest.KEY_STRING));
                 Utils.toast(this, getString(R.string.init_ok));
             } catch (Exception e) {
                 e.printStackTrace();
@@ -229,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
             final String classifierContent = data.getString(StringHttpRequest.KEY_STRING);
 
             try {
-                Utils.getBrandByClassifier(mBrands, requestedBrand).setLocalClassifier(FileManager.createClassifierFile(
+                Utils.getBrandByClassifier(mBrands, requestedBrand).setLocalClassifier(mFileManager.createClassifierFile(
                         getCacheDir(), classifierContent, requestedBrand));
             } catch (IOException e) {
                 e.printStackTrace();
@@ -237,7 +217,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void onJSONRequestResult(Bundle data){
+    private void onJSONRequestResult(Bundle data) {
         try {
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
             JsonParser jsonParser = new JsonParser(jsonData);
@@ -246,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "onJSONRequestResult: brands = " + mBrands);
             Log.d(TAG, "onJSONRequestResult: vocabulary = " + mVocabularyName);
 
+            mFileManager.setBrandsNumber(mBrands.size());
             getClassifiers();
             getVocabulary();
         } catch (JSONException e) {
@@ -353,6 +334,34 @@ public class MainActivity extends AppCompatActivity {
                 mPhotoAdapter.notifyDataSetChanged();
             }
         });
+    }
+
+
+    public void initFab() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder
+                        .setMessage(R.string.dialog_select_prompt)
+                        .setPositiveButton(R.string.dialog_select_gallery, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startGalleryChooser();
+                            }
+                        })
+                        .setNegativeButton(R.string.dialog_select_camera, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                startCamera();
+                            }
+                        });
+                builder.create().show();
+            }
+        });
+        fab.setVisibility(View.VISIBLE);
+        Log.d(TAG, "initFab: visible");
     }
 
 
