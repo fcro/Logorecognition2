@@ -9,24 +9,20 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
-/**
- * Created by fcro on 19/01/2017.
- */
-
 public abstract class HttpRequest implements Response.Listener, Response.ErrorListener {
 
     private static final String TAG = HttpRequest.class.getSimpleName();
 
-    static protected RequestQueue mQueue;
+    public  static final String KEY_REQUEST = "key_request";
 
-    public static final String KEY_REQUEST = "key_request";
+    static RequestQueue mQueue;
 
-    protected String mBaseUrl;
-    protected Handler mHandler;
-    protected String request;
+    String mBaseUrl;
+    Handler mHandler;
+    String request;
 
 
-    public HttpRequest(Context context, Handler handler, String baseUrl) {
+    HttpRequest(Context context, Handler handler, String baseUrl) {
         mQueue = Volley.newRequestQueue(context);
         mHandler = handler;
         mBaseUrl = baseUrl;

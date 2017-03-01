@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 
 /**
@@ -42,14 +41,4 @@ public class StringHttpRequest extends HttpRequest {
 
         mHandler.sendMessage(message);
     }
-//
-//    @Override
-//    public void onResponse(Object response) {
-//        sendMessage(response);
-//    }
-
-//    @Override
-//    public void onErrorResponse(VolleyError error) {
-//
-//    }
 }

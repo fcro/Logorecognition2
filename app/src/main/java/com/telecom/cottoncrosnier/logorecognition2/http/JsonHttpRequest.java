@@ -7,7 +7,6 @@ import android.os.Message;
 import android.util.Log;
 
 import com.android.volley.Request;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
 /**
