@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -17,29 +18,30 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:id="@+id/layout_buttons" >
+        android:id="@+id/layout_buttons"
+        android:layout_weight="1" >
 
-        <Button
-            android:text="@string/button_crop"
+
+        <ImageButton
             android:id="@+id/button_crop"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="start"
-            android:textAlignment="center"
-            android:textSize="14sp" />
+            app:srcCompat="@android:drawable/ic_menu_crop" />
 
-        <Button
-            android:text="@string/button_analyse"
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
             android:id="@+id/button_analyse"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
-            android:textAlignment="center"
-            android:textSize="14sp" />
+            app:srcCompat="@android:drawable/ic_menu_add" />
+
 
     </LinearLayout>
-
 
 </LinearLayout>

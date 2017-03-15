@@ -6,7 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import com.soundcloud.android.crop.Crop;
@@ -23,8 +23,8 @@ public class EditImageActivity extends Activity {
     private static final String TAG = EditImageActivity.class.getSimpleName();
 
     private ImageView mImageView;
-    private Button mButtonCrop;
-    private Button mButtonAnalyse;
+    private ImageButton mButtonCrop;
+    private ImageButton mButtonAnalyse;
 
     private Uri mImgPath;
 
@@ -37,8 +37,8 @@ public class EditImageActivity extends Activity {
 
         mImageView = (ImageView) findViewById(R.id.image_view);
 
-        mButtonCrop = (Button) findViewById(R.id.button_crop);
-        mButtonAnalyse = (Button)findViewById(R.id.button_analyse);
+        mButtonCrop = (ImageButton) findViewById(R.id.button_crop);
+        mButtonAnalyse = (ImageButton)findViewById(R.id.button_analyse);
 
         final Intent intent = getIntent();
         Bundle b = intent.getExtras();
