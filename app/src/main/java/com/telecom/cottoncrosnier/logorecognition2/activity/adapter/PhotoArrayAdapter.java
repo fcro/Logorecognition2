@@ -68,7 +68,6 @@ public class PhotoArrayAdapter extends ArrayAdapter<Photo> {
             holder = new PhotoHolder();
             holder.photoImage = (ImageView) row.findViewById(R.id.photo_image);
             holder.photoBrandName = (TextView) row.findViewById(R.id.photo_brandname);
-            holder.photoBrandInfo = (TextView) row.findViewById(R.id.photo_brandinfo);
 
             row.setTag(holder);
         } else {
@@ -105,7 +104,6 @@ public class PhotoArrayAdapter extends ArrayAdapter<Photo> {
     private static class PhotoHolder {
         ImageView photoImage;
         TextView photoBrandName;
-        TextView photoBrandInfo;
     }
 
     /**
