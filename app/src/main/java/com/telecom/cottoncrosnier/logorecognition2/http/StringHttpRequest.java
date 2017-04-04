@@ -12,13 +12,22 @@ import com.android.volley.toolbox.StringRequest;
  * Created by matthieu on 19/01/17.
  */
 
+/**
+ * Requête Volley pour récupérer un fichier texte.
+ */
 public class StringHttpRequest extends HttpRequest {
 
     public static final int STRING_REQUEST = 3333;
     public static final String KEY_STRING = "key_string";
 
 
-
+    /**
+     * Instancie une {@link StringHttpRequest}.
+     * @param context contexte appelant.
+     * @param handler classe {@link Handler} décrivant l'action à faire selon le fichier
+     *                reçu.
+     * @param baseUrl adresse du serveur HTTP sur lequel les requêtes seront envoyées.
+     */
     public StringHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
     }

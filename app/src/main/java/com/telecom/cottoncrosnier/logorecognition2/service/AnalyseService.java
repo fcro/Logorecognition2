@@ -34,6 +34,9 @@ import java.util.List;
  * Created by matthieu on 19/01/17.
  */
 
+/**
+ * Service analysant les images avec OpenCV pour trouver une marque.
+ */
 public class AnalyseService extends IntentService{
 
 
@@ -49,7 +52,10 @@ public class AnalyseService extends IntentService{
         super("AnalyseService");
     }
 
-
+    /**
+     * Instancie le vocabulaire de Bag Of Words à partir du fichier {@code vocabularyFile}.
+     * @param vocabularyFile fichier de vocabulaire.
+     */
     private void setVoca(File vocabularyFile) {
 
         Log.d(TAG, "setVoca() called with: vocabularyFile = [" + vocabularyFile.getAbsolutePath() + "]");
@@ -74,6 +80,12 @@ public class AnalyseService extends IntentService{
         Log.d(TAG, "setVoca() returned: ");
     }
 
+    /**
+     * Calcule l'histogramme d'une image à l'aide de l'algorithme SIFT.
+     * @param imgPath chemin vers l'image à analyser.
+     * @param detector instance de l'objet SIFT utilisée pour calculer l'histogramme.
+     * @return matrice {@link Mat} histogramme de l'image.
+     */
     private Mat computeHist(String imgPath, SIFT detector) {
         Log.d(TAG, "computeHist() called with: imgPath = [" + imgPath + "], mDetector = [" + detector + "]");
         Mat response_hist = new Mat();
@@ -90,6 +102,12 @@ public class AnalyseService extends IntentService{
         return response_hist;
     }
 
+    /**
+     * Compare la matrice {@code response_hist} avec tous les classifiers de marques et retourne la
+     * marque la plus proche.
+     * @param response_hist matrice histogramme de l'image à comparer.
+     * @return objet {@link Brand} représentant la marque la plus proche de la matrice donnée.
+     */
     private Brand bestMatch(Mat response_hist) {
         Log.d(TAG, "bestMatch() called with: response_hist = [" + response_hist + "], classifiers = []");
         float minf = Float.MAX_VALUE;
@@ -106,6 +124,10 @@ public class AnalyseService extends IntentService{
         return bestMatch;
     }
 
+    /**
+     * Parcourt une liste de marques et initialise leurs classifiers {@link CvSVM}.
+     * @param brandList list des marques connues.
+     */
     public void loadClassifier(List<Brand> brandList){
         Log.d(TAG, "loadClassifier() called");
 
@@ -118,6 +140,12 @@ public class AnalyseService extends IntentService{
     }
 
 
+    /**
+     * Retourne l'objet {@link Brand} correspondant à la marque détectée sur une image.
+     * @param path chemin vers l'image à analyser.
+     * @param vocabularyFile fichier de vocabulaire OpenCV.
+     * @return la marque détectée sur l'image.
+     */
     public Brand computeImageHist(Uri path, File vocabularyFile) {
         Log.d(TAG, "computeImageHist() called with: path = [" + path + "]");
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -129,11 +157,12 @@ public class AnalyseService extends IntentService{
         Log.d(TAG, "computeImageHist: after bitmaptocache");
         setVoca(vocabularyFile);
         Mat response_hist = computeHist(bitmapFile.getAbsolutePath(), mDetector);
-        Brand  bestBrand = bestMatch(response_hist);
+        Brand bestBrand = bestMatch(response_hist);
         Log.d(TAG, "computeImageHist: bestMatch = "+bestBrand.getBrandName());
 
         return bestBrand;
     }
+
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -157,6 +186,12 @@ public class AnalyseService extends IntentService{
         }
     }
 
+    /**
+     * Appelé à la fin du traitement du service. Envoie le résultat de l'analyse au
+     * {@link LocalBroadcastManager} pour être reçu par {@link MainActivity}.
+     * @param bestBrand marque détectée dans l'image analysée.
+     * @param imgPath chemin vers l'image analysée.
+     */
     private void onResult(Brand bestBrand, Uri imgPath){
         Intent localIntent = new Intent(BROADCAST_ACTION_ANALYZE)
                 .putExtra(MainActivity.KEY_RESPONSE_BRAND, bestBrand)
@@ -165,7 +200,7 @@ public class AnalyseService extends IntentService{
     }
 
 
-    private class BrandMap{
+    private class BrandMap {
 
         private CvSVM classifier;
         private Brand brand;

@@ -12,6 +12,9 @@ import com.android.volley.toolbox.ImageRequest;
  * Created by matthieu on 19/01/17.
  */
 
+/**
+ * Requête Volley pour récupérer une image.
+ */
 public class ImageHttpRequest extends HttpRequest {
 
     private static final String TAG = ImageHttpRequest.class.getSimpleName();
@@ -20,6 +23,13 @@ public class ImageHttpRequest extends HttpRequest {
     public static final String KEY_IMAGE = "key_image";
 
 
+    /**
+     * Instancie une {@link ImageHttpRequest}.
+     * @param context contexte appelant.
+     * @param handler classe {@link Handler} décrivant l'action à faire selon le fichier
+     *                reçu.
+     * @param baseUrl adresse du serveur HTTP sur lequel les requêtes seront envoyées.
+     */
     public ImageHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
     }

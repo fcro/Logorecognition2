@@ -13,6 +13,9 @@ import com.android.volley.toolbox.JsonObjectRequest;
  * Created by matthieu on 19/01/17.
  */
 
+/**
+ * Requête Volley pour récupérer un fichier JSON.
+ */
 public class JsonHttpRequest extends HttpRequest {
 
     public static final int JSON_REQUEST = 2222;
@@ -21,6 +24,13 @@ public class JsonHttpRequest extends HttpRequest {
     private static final String TAG = JsonHttpRequest.class.getSimpleName();
 
 
+    /**
+     * Instancie une {@link JsonHttpRequest}.
+     * @param context contexte appelant.
+     * @param handler classe {@link Handler} décrivant l'action à faire selon le fichier
+     *                reçu.
+     * @param baseUrl adresse du serveur HTTP sur lequel les requêtes seront envoyées.
+     */
     public JsonHttpRequest(Context context, Handler handler, String baseUrl) {
         super(context, handler, baseUrl);
         Log.d(TAG, "JsonHttpRequest() called with: context = [" + context + "], handler = [" + handler + "], baseUrl = [" + baseUrl + "]");

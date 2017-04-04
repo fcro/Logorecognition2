@@ -8,6 +8,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+/**
+ * Classe fournissant des services de création et vérification de fichiers.
+ */
 public class FileManager {
 
     private static final String TAG = FileManager.class.getSimpleName();
@@ -60,6 +63,16 @@ public class FileManager {
         }
     }
 
+    /**
+     * Crée un fichier de classifier avec comme contenu {@code content}. Retourne
+     * toujours le fichier créé.
+     *
+     * @param cacheDir répertoire cache de l'application pour stocker le nouveau fichier.
+     * @param content contenu du fichier reçu.
+     * @param name nom du fichier à créer.
+     * @return l'objet {@link File} créé dans le cache.
+     * @throws IOException si une erreur se produit pendant la lecture ou l'écriture du fichier.
+     */
     public File createClassifierFile(File cacheDir, String content, String name) throws IOException{
         Log.d(TAG, "createClassifierFile() called with: cacheDir = [" + cacheDir + "], content = [" + "..." + "], name = [" +name +"]");
         File classifierFile = new File(cacheDir.getPath() + "/" + name);
@@ -80,6 +93,10 @@ public class FileManager {
         }
     }
 
+    /**
+     * Renvoie {@code true} et affiche le bouton d'ajout d'images dans {@link MainActivity} si tous
+     * les fichiers de vocabulaire et clasifier ont été créés.
+     */
     private void checkIsComplete() {
         if (mFileCount[0] ==  mBrandsNumber && mFileCount[1] == 1) {
             Log.d(TAG, "checkIsComplete: isComplete");

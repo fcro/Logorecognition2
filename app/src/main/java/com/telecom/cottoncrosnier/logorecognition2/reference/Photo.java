@@ -6,6 +6,10 @@ import android.graphics.Bitmap;
  * Created by matthieu on 21/02/17.
  */
 
+/**
+ * Représentation d'une photo analysée.
+ * Contient une image au format Bitmap et la marque détectée.
+ */
 public class Photo {
 
     private Bitmap mBitmap;

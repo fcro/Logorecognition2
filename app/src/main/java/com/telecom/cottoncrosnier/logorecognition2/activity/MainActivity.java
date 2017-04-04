@@ -48,6 +48,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Activité principale.
+ * Comporte un bouton d'ajout d'image, et la liste des images analysées.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -189,6 +193,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Appelé quand on reçoit un fichier texte depuis le serveur web.
+     * @param data coutenu du fichier reçu.
+     */
     private void onStringRequestResult(Bundle data){
         Log.d(TAG, "onStringRequestResult() called ");
         if (data.getString(HttpRequest.KEY_REQUEST).equals(mVocabularyName)) {
@@ -217,6 +225,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Appelé quand on reçoit un fichier JSON depuis le serveur web.
+     * @param data coutenu du fichier reçu.
+     */
     private void onJSONRequestResult(Bundle data) {
         try {
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
@@ -234,12 +246,20 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Appelé quand on reçoit un fichier image depuis le serveur web.
+     * @param data coutenu du fichier reçu.
+     */
     private void onImageRequestResult(Bundle data){
         Log.d(TAG, "onImageRequestResult: request = " + data.getString(HttpRequest.KEY_REQUEST));
         Bitmap img = data.getParcelable(ImageHttpRequest.KEY_IMAGE);
         Log.d(TAG, "onImageRequestResult: img " + img.toString());
     }
 
+    /**
+     * Pour chaque marque connue, envoie une requête HTTP GET au serveur web pour récupérer le
+     * classifier de chaque marque.
+     */
     private void getClassifiers() {
         for (Brand brand : mBrands) {
             new StringHttpRequest(this, handler, BASE_URL)
@@ -247,16 +267,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Envoie une requette HTTP GET au serveur web pour récupérer le vocabulaire OpenCV.
+     */
     private void getVocabulary() {
         new StringHttpRequest(this, handler, BASE_URL)
                 .sendRequest(mVocabularyName);
     }
 
+    /**
+     * Démarre l'activité de prise de photo par la caméra.
+     */
     public void startCamera() {
         Intent startTakePhoto = new Intent(MainActivity.this, TakePhotoActivity.class);
         startActivityForResult(startTakePhoto, TAKE_PHOTO_REQUEST);
     }
 
+    /**
+     * Démarre l'activité de prise de photo dans la gallerie.
+     */
     public void startGalleryChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -265,6 +294,9 @@ public class MainActivity extends AppCompatActivity {
                 GALLERY_IMAGE_REQUEST);
     }
 
+    /**
+     * Démarre un navigateur web pointant sur la page web de la marque sélectionnée.
+     */
     private void startBrowser() {
         Log.d(TAG, "onOptionsItemSelected: view website");
         if (mId != INVALID_POSITION) {
@@ -280,6 +312,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Démarre le service d'analyse d'image.
+     * @param uri chemin vers l'image à analyser.
+     */
     private void startAnalyze(final Uri uri) {
         Intent analyzeIntent = new Intent(this, AnalyseService.class);
 
@@ -337,6 +373,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Initialise les listeners du bouton d'ajout d'image et l'affiche.
+     */
     public void initFab() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -365,6 +404,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Initialise le {@link BroadcastReceiver} local à l'application.
+     * Utilisé par le service d'analyse d'image pour envoyer le résultat de l'analyse.
+     */
     private void setBroadcastReceiver() {
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
             @Override

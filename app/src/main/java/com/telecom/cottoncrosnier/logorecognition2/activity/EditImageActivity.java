@@ -18,6 +18,10 @@ import java.io.File;
  * Created by fcro on 23/02/2017.
  */
 
+/**
+ * Activité affichant une image sélectionnée avant de l'analyser.
+ * Propose de la redimensionner ou valider son choix.
+ */
 public class EditImageActivity extends Activity {
 
     private static final String TAG = EditImageActivity.class.getSimpleName();
@@ -60,6 +64,9 @@ public class EditImageActivity extends Activity {
     }
 
 
+    /**
+     * Initialise les listeners des boutons disponibles : redimensionner ou valider.
+     */
     private void setButtonListener() {
         mButtonCrop.setOnClickListener(new View.OnClickListener() {
             @Override

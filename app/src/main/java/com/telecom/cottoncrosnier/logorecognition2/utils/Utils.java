@@ -208,6 +208,12 @@ public class Utils {
     }
 
 
+    /**
+     * Renvoie l'objet Brand correspondant au nom {@code brandName}
+     * @param brandList Liste des objets Brand instanciés
+     * @param brandName Nom de la marque recherchée
+     * @return objet Brand correspondant au nom {@code brandName}
+     */
     public static Brand getBrandByClassifier(List<Brand> brandList, String brandName){
         Log.d(TAG, "getBrandByClassifier() called with: brandList = [" + brandList+ "], brandName = [" + brandName + "]");
         for (Brand brand : brandList) {
