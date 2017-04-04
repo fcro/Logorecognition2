@@ -100,7 +100,7 @@ public class FileManager {
     private void checkIsComplete() {
         if (mFileCount[0] ==  mBrandsNumber && mFileCount[1] == 1) {
             Log.d(TAG, "checkIsComplete: isComplete");
-            mMainActivity.initFab();
+            mMainActivity.onDatabaseInitFinished();
         }
     }
 }

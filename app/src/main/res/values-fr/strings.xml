@@ -8,9 +8,9 @@
     <string name="menu_delete_photo">Supprimer la photo</string>
     <string name="menu_view_web_site">Visiter le site web</string>
     <string name="error">Erreur</string>
-    <string name="init_nok">Initialisation en cours</string>
     <string name="progress_analyzing">Analyse en cours</string>
     <string name="progress_wait">Veuillez patienter</string>
-    <string name="init_ok">Application initialisée</string>
     <string name="button_crop">Crop image</string>
+    <string name="button_analyse">Analyser l\'image</string>
+    <string name="progress_initdb">Initialisation de la base</string>
 </resources>

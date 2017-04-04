@@ -200,25 +200,28 @@ public class MainActivity extends AppCompatActivity {
     private void onStringRequestResult(Bundle data){
         Log.d(TAG, "onStringRequestResult() called ");
         if (data.getString(HttpRequest.KEY_REQUEST).equals(mVocabularyName)) {
+            // fichier de vocabulaire
             Log.d(TAG, "onStringRequestResult: received vocabulary");
             try {
                 Log.d(TAG, "onStringRequestResult: createVocaFile");
                 vocabularyFile = mFileManager.createVocabularyFile(getCacheDir(),
                         data.getString(StringHttpRequest.KEY_STRING));
-                Utils.toast(this, getString(R.string.init_ok));
+
+                mProgressDialog.setMessage("Downloaded " + mVocabularyName + "...");
             } catch (Exception e) {
                 e.printStackTrace();
-                Utils.toast(this, getString(R.string.init_nok));
                 StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
                 ymlRequest.sendRequest(mVocabularyName);
             }
         } else {
+            // fichier de classifier
             final String requestedBrand = data.getString(StringHttpRequest.KEY_REQUEST);
             final String classifierContent = data.getString(StringHttpRequest.KEY_STRING);
 
             try {
                 Utils.getBrandByClassifier(mBrands, requestedBrand).setLocalClassifier(mFileManager.createClassifierFile(
                         getCacheDir(), classifierContent, requestedBrand));
+                mProgressDialog.setMessage("Downloaded " + requestedBrand + "...");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -231,6 +234,8 @@ public class MainActivity extends AppCompatActivity {
      */
     private void onJSONRequestResult(Bundle data) {
         try {
+            mProgressDialog = ProgressDialog.show(
+                    this, getString(R.string.progress_wait), data.getString(JsonHttpRequest.KEY_REQUEST) + "...");
             JSONObject jsonData = new JSONObject(data.getString(JsonHttpRequest.KEY_JSON));
             JsonParser jsonParser = new JsonParser(jsonData);
             mBrands = jsonParser.readBrandArray();
@@ -374,9 +379,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     /**
-     * Initialise les listeners du bouton d'ajout d'image et l'affiche.
+     * Appelé quand tous les fichiers nécessaires aux analyses ont été créés.
+     * Retire le {@link ProgressDialog} et affiche le bouton d'ajout d'images.
      */
-    public void initFab() {
+    public void onDatabaseInitFinished() {
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -400,7 +406,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         fab.setVisibility(View.VISIBLE);
-        Log.d(TAG, "initFab: visible");
+        Log.d(TAG, "onDatabaseInitFinished: visible");
+
+        mProgressDialog.dismiss();
     }
 
 

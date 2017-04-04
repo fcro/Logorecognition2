@@ -8,12 +8,11 @@
 
     <string name="menu_view_web_site">View web Site</string>
     <string name="menu_delete_photo">Delete photo</string>
-    <string name="init_nok">Vocabulary not set</string>
-    <string name="init_ok">Vocabulary set</string>
     <string name="error">error</string>
 
     <string name="progress_wait">Please wait</string>
     <string name="progress_analyzing">Analyzing image</string>
+    <string name="progress_initdb">Initializing database</string>
     <string name="button_crop">Crop image</string>
     <string name="button_analyse">Analyse image</string>
 
