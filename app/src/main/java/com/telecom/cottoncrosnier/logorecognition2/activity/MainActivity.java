@@ -111,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
                     case 0:
                         Brand brand = (Brand) msg.getData().getSerializable("brand");
                         Log.d(TAG, "handleMessage: "+brand.getBrandName());
+                        break;
+                    case HttpRequest.ERROR:
+                        retryDownload();
+                        return false;
                 }
             }
             return true;

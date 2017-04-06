@@ -1,7 +1,9 @@
 package com.telecom.cottoncrosnier.logorecognition2.http;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -17,6 +19,7 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
     private static final String TAG = HttpRequest.class.getSimpleName();
 
     public  static final String KEY_REQUEST = "key_request";
+    public static final int ERROR = -1;
 
     static RequestQueue mQueue;
 
@@ -57,5 +60,11 @@ public abstract class HttpRequest implements Response.Listener, Response.ErrorLi
     }
 
     @Override
-    public  void onErrorResponse(VolleyError error){}
+    public  void onErrorResponse(VolleyError error){
+        Log.d(TAG, "onErrorResponse: ");
+        Message message = mHandler.obtainMessage();
+        message.arg1 = ERROR;
+
+        mHandler.sendMessage(message);
+    }
 }
