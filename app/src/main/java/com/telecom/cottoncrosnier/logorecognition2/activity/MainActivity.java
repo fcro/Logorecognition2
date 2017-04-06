@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int EDIT_IMAGE_REQUEST = 3;
     private static final int VIEW_BROWSER_REQUEST = 4;
 
-    private static final String BASE_URL = "http://www-rech.telecom-lille.fr/nonfreesift/";
+    private static final String BASE_URL = "http://www-rech.telecom-lille.fr/freeorb/";
 
     private static final String JSON_REQUEST = "index.json";
 
