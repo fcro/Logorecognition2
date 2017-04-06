@@ -73,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String BASE_URL_SODA = "http://www-rech.telecom-lille.fr/nonfreesift/";
     private static String mBaseUrl;
 
+    private BroadcastReceiver mBbroadcastReceiver;
     private static final String JSON_REQUEST = "index.json";
 
     private List<Brand> mBrands;
@@ -152,6 +153,8 @@ public class MainActivity extends AppCompatActivity {
         } else if (id == R.id.delete_photo) {
             deletePhoto();
             return true;
+        } else if (id == R.id.change_base){
+            chooseURLBase();
         }
 
         return super.onOptionsItemSelected(item);
@@ -416,7 +419,10 @@ public class MainActivity extends AppCompatActivity {
      * Utilisé par le service d'analyse d'image pour envoyer le résultat de l'analyse.
      */
     private void setBroadcastReceiver() {
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        if (mBbroadcastReceiver != null) {
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(mBbroadcastReceiver);
+        }
+        mBbroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 Brand brand = (Brand) intent.getSerializableExtra(KEY_RESPONSE_BRAND);
@@ -435,27 +441,27 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 mProgressDialog.dismiss();
-
-//                LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(mBroadcastReceiver);
             }
         };
 
-        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBbroadcastReceiver,
                 new IntentFilter(AnalyseService.BROADCAST_ACTION_ANALYZE));
     }
 
 
     private void chooseURLBase(){
+        mFileManager.resetFileCount();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder
-                .setMessage("choose your data base")
-                .setPositiveButton("Cars logo", new DialogInterface.OnClickListener() {
+                .setMessage(R.string.choose_data_base)
+                .setPositiveButton(R.string.car_logo, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setBaseUrl(BASE_URL_CAR);
                     }
                 })
-                .setNegativeButton("Sodas logo", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.soda_logo, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setBaseUrl(BASE_URL_SODA);

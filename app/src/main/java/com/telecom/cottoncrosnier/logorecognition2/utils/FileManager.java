@@ -29,6 +29,10 @@ public class FileManager {
         mFileCount = new int[2];
     }
 
+    public void resetFileCount(){
+        mFileCount[0] = 0;
+        mFileCount[1] = 0;
+    }
 
     public void setBrandsNumber(int brandsNumber) {
         mBrandsNumber = brandsNumber;

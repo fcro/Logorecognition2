@@ -14,4 +14,10 @@
         android:orderInCategory="100"
         android:title="@string/menu_delete_photo"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/change_base"
+        android:orderInCategory="100"
+        android:title="@string/change_base"
+        app:showAsAction="never" />
 </menu>
