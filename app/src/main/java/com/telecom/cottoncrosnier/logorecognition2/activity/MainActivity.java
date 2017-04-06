@@ -485,4 +485,26 @@ public class MainActivity extends AppCompatActivity {
 
         setBroadcastReceiver();
     }
+
+    /**
+     * Permets de retester le téléchargement
+     */
+    private void retryDownload() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder
+                .setMessage(R.string.retry_download)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        chooseURLBase();
+                    }
+                })
+                .setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                });
+        builder.create().show();
+    }
 }

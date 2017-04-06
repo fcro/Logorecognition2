@@ -20,5 +20,8 @@
     <string name="soda_logo">Soda logos</string>
     <string name="change_base">Change base</string>
     <string name="downloaded">Downloaded</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="retry_download">Retry download ?</string>
 
 </resources>
