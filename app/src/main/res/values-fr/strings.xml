@@ -13,4 +13,9 @@
     <string name="button_crop">Crop image</string>
     <string name="button_analyse">Analyser l\'image</string>
     <string name="progress_initdb">Initialisation de la base</string>
+    <string name="car_logo">Logos de voitures</string>
+    <string name="change_base">Changer de base</string>
+    <string name="choose_data_base">Choisissez une base de données</string>
+    <string name="soda_logo">Logos de sodas</string>
+    <string name="downloaded">Reçu</string>
 </resources>

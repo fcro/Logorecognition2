@@ -8,16 +8,17 @@
 
     <string name="menu_view_web_site">View web Site</string>
     <string name="menu_delete_photo">Delete photo</string>
-    <string name="error">error</string>
+    <string name="error">Error</string>
 
     <string name="progress_wait">Please wait</string>
     <string name="progress_analyzing">Analyzing image</string>
     <string name="progress_initdb">Initializing database</string>
     <string name="button_crop">Crop image</string>
     <string name="button_analyse">Analyse image</string>
-    <string name="choose_data_base">choose your data base</string>
-    <string name="car_logo">Cars logo</string>
-    <string name="soda_logo">Sodas logo</string>
-    <string name="change_base">change base</string>
+    <string name="choose_data_base">Choose your database</string>
+    <string name="car_logo">Car logos</string>
+    <string name="soda_logo">Soda logos</string>
+    <string name="change_base">Change base</string>
+    <string name="downloaded">Downloaded</string>
 
 </resources>

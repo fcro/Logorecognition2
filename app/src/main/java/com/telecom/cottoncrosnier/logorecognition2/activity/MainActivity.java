@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 vocabularyFile = mFileManager.createVocabularyFile(getCacheDir(),
                         data.getString(StringHttpRequest.KEY_STRING));
 
-                mProgressDialog.setMessage("Downloaded " + mVocabularyName + "...");
+                mProgressDialog.setMessage(R.string.downloaded + mVocabularyName + "...");
             } catch (Exception e) {
                 e.printStackTrace();
                 StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, mBaseUrl);
