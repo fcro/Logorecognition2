@@ -69,7 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private static final int EDIT_IMAGE_REQUEST = 3;
     private static final int VIEW_BROWSER_REQUEST = 4;
 
-    private static final String BASE_URL = "http://www-rech.telecom-lille.fr/freeorb/";
+    private static final String BASE_URL_CAR = "http://www-rech.telecom-lille.fr/freeorb/";
+    private static final String BASE_URL_SODA = "http://www-rech.telecom-lille.fr/nonfreesift/";
+    private static String mBaseUrl;
 
     private static final String JSON_REQUEST = "index.json";
 
@@ -129,10 +131,7 @@ public class MainActivity extends AppCompatActivity {
 
         mFileManager = new FileManager(this);
 
-        JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, BASE_URL);
-        jsonHttpRequest.sendRequest(JSON_REQUEST);
-
-        setBroadcastReceiver();
+        chooseURLBase();
     }
 
     @Override
@@ -210,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 mProgressDialog.setMessage("Downloaded " + mVocabularyName + "...");
             } catch (Exception e) {
                 e.printStackTrace();
-                StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, BASE_URL);
+                StringHttpRequest ymlRequest = new StringHttpRequest(this, handler, mBaseUrl);
                 ymlRequest.sendRequest(mVocabularyName);
             }
         } else {
@@ -267,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void getClassifiers() {
         for (Brand brand : mBrands) {
-            new StringHttpRequest(this, handler, BASE_URL)
+            new StringHttpRequest(this, handler, mBaseUrl)
                     .sendRequest("classifiers/" + brand.getClassifierFile());
         }
     }
@@ -276,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
      * Envoie une requette HTTP GET au serveur web pour récupérer le vocabulaire OpenCV.
      */
     private void getVocabulary() {
-        new StringHttpRequest(this, handler, BASE_URL)
+        new StringHttpRequest(this, handler, mBaseUrl)
                 .sendRequest(mVocabularyName);
     }
 
@@ -443,5 +442,36 @@ public class MainActivity extends AppCompatActivity {
 
         LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
                 new IntentFilter(AnalyseService.BROADCAST_ACTION_ANALYZE));
+    }
+
+
+    private void chooseURLBase(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder
+                .setMessage("choose your data base")
+                .setPositiveButton("Cars logo", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setBaseUrl(BASE_URL_CAR);
+                    }
+                })
+                .setNegativeButton("Sodas logo", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setBaseUrl(BASE_URL_SODA);
+                    }
+                });
+        builder.create().show();
+
+
+    }
+
+    private void setBaseUrl(String baseUrl) {
+        mBaseUrl = baseUrl;
+
+        JsonHttpRequest jsonHttpRequest = new JsonHttpRequest(this, handler, baseUrl);
+        jsonHttpRequest.sendRequest(JSON_REQUEST);
+
+        setBroadcastReceiver();
     }
 }
