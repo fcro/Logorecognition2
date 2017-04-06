@@ -448,7 +448,9 @@ public class MainActivity extends AppCompatActivity {
                 new IntentFilter(AnalyseService.BROADCAST_ACTION_ANALYZE));
     }
 
-
+    /**
+     * Permet de choisir une autre base de logos
+     */
     private void chooseURLBase(){
         mFileManager.resetFileCount();
 
@@ -472,6 +474,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Envoie les requetes Http pour les fichiers de traitement d'image
+     */
     private void setBaseUrl(String baseUrl) {
         mBaseUrl = baseUrl;
 
