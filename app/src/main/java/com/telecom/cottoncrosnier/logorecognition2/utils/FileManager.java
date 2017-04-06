@@ -29,6 +29,10 @@ public class FileManager {
         mFileCount = new int[2];
     }
 
+    /**
+     * Remet à zéro les compteur de fichiers recus
+     * Appelé quand on change de base.
+     */
     public void resetFileCount(){
         mFileCount[0] = 0;
         mFileCount[1] = 0;
